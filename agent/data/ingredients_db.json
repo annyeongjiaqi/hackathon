@@ -1,0 +1,271 @@
+{
+  "_meta": {
+    "nutrition_basis": "per_100g",
+    "nutrition_source": "MyFoodData Nutrition Facts Spreadsheet Release 1.4 / MyFoodData 100g nutrition entries",
+    "cost_basis": "Approximate Singapore grocery planning values, benchmarked against NTUC FairPrice listings in Sep 2026",
+    "cost_note": "Costs are estimates for planning, not guaranteed live supermarket prices.",
+    "shelf_life_note": "Shelf life assumes typical refrigerated/dry storage after purchase; use conservative values for meal planning."
+  },
+  "chicken breast": {
+    "category": "meat_poultry",
+    "cost_per_100g": 1.5,
+    "nutrition_per_100g": {
+      "calories": 165,
+      "protein_g": 31.0,
+      "carbs_g": 0.0,
+      "fat_g": 3.6,
+      "fiber_g": 0.0,
+      "sodium_mg": 74
+    },
+    "shelf_life_days": 3,
+    "substitutes": [
+      "firm tofu",
+      "canned tuna"
+    ]
+  },
+  "egg": {
+    "category": "eggs",
+    "cost_per_100g": 0.52,
+    "nutrition_per_100g": {
+      "calories": 155,
+      "protein_g": 12.6,
+      "carbs_g": 1.1,
+      "fat_g": 10.6,
+      "fiber_g": 0.0,
+      "sodium_mg": 124
+    },
+    "shelf_life_days": 21,
+    "substitutes": [
+      "firm tofu",
+      "chicken breast"
+    ]
+  },
+  "firm tofu": {
+    "category": "plant_protein",
+    "cost_per_100g": 0.35,
+    "nutrition_per_100g": {
+      "calories": 76,
+      "protein_g": 8.1,
+      "carbs_g": 1.9,
+      "fat_g": 4.8,
+      "fiber_g": 0.3,
+      "sodium_mg": 7
+    },
+    "shelf_life_days": 5,
+    "substitutes": [
+      "egg",
+      "chicken breast"
+    ]
+  },
+  "canned tuna": {
+    "category": "seafood",
+    "cost_per_100g": 1.75,
+    "nutrition_per_100g": {
+      "calories": 116,
+      "protein_g": 25.5,
+      "carbs_g": 0.0,
+      "fat_g": 0.8,
+      "fiber_g": 0.0,
+      "sodium_mg": 247
+    },
+    "shelf_life_days": 365,
+    "substitutes": [
+      "chicken breast",
+      "firm tofu"
+    ]
+  },
+  "brown rice": {
+    "category": "grains",
+    "cost_per_100g": 0.35,
+    "nutrition_per_100g": {
+      "calories": 123,
+      "protein_g": 2.7,
+      "carbs_g": 25.6,
+      "fat_g": 1.0,
+      "fiber_g": 1.6,
+      "sodium_mg": 4
+    },
+    "shelf_life_days": 180,
+    "substitutes": [
+      "sweet potato",
+      "rolled oats"
+    ]
+  },
+  "rolled oats": {
+    "category": "grains",
+    "cost_per_100g": 0.48,
+    "nutrition_per_100g": {
+      "calories": 389,
+      "protein_g": 16.9,
+      "carbs_g": 66.3,
+      "fat_g": 6.9,
+      "fiber_g": 10.6,
+      "sodium_mg": 2
+    },
+    "shelf_life_days": 180,
+    "substitutes": [
+      "brown rice",
+      "sweet potato"
+    ]
+  },
+  "sweet potato": {
+    "category": "root_vegetable",
+    "cost_per_100g": 0.35,
+    "nutrition_per_100g": {
+      "calories": 90,
+      "protein_g": 2.0,
+      "carbs_g": 20.7,
+      "fat_g": 0.2,
+      "fiber_g": 3.3,
+      "sodium_mg": 36
+    },
+    "shelf_life_days": 14,
+    "substitutes": [
+      "brown rice",
+      "carrot"
+    ]
+  },
+  "broccoli": {
+    "category": "vegetable",
+    "cost_per_100g": 1.3,
+    "nutrition_per_100g": {
+      "calories": 34,
+      "protein_g": 2.8,
+      "carbs_g": 6.6,
+      "fat_g": 0.4,
+      "fiber_g": 2.6,
+      "sodium_mg": 33
+    },
+    "shelf_life_days": 5,
+    "substitutes": [
+      "spinach",
+      "carrot"
+    ]
+  },
+  "spinach": {
+    "category": "leafy_vegetable",
+    "cost_per_100g": 0.65,
+    "nutrition_per_100g": {
+      "calories": 28,
+      "protein_g": 2.9,
+      "carbs_g": 2.6,
+      "fat_g": 0.6,
+      "fiber_g": 1.6,
+      "sodium_mg": 79
+    },
+    "shelf_life_days": 4,
+    "substitutes": [
+      "broccoli",
+      "carrot"
+    ]
+  },
+  "tomato": {
+    "category": "vegetable",
+    "cost_per_100g": 0.55,
+    "nutrition_per_100g": {
+      "calories": 18,
+      "protein_g": 0.9,
+      "carbs_g": 3.9,
+      "fat_g": 0.2,
+      "fiber_g": 1.2,
+      "sodium_mg": 5
+    },
+    "shelf_life_days": 7,
+    "substitutes": [
+      "carrot",
+      "broccoli"
+    ]
+  },
+  "onion": {
+    "category": "vegetable",
+    "cost_per_100g": 0.35,
+    "nutrition_per_100g": {
+      "calories": 42,
+      "protein_g": 0.9,
+      "carbs_g": 9.9,
+      "fat_g": 0.1,
+      "fiber_g": 2.2,
+      "sodium_mg": 1
+    },
+    "shelf_life_days": 21,
+    "substitutes": [
+      "carrot",
+      "garlic"
+    ]
+  },
+  "carrot": {
+    "category": "root_vegetable",
+    "cost_per_100g": 0.35,
+    "nutrition_per_100g": {
+      "calories": 41,
+      "protein_g": 0.8,
+      "carbs_g": 9.1,
+      "fat_g": 0.1,
+      "fiber_g": 2.7,
+      "sodium_mg": 69
+    },
+    "shelf_life_days": 21,
+    "substitutes": [
+      "sweet potato",
+      "broccoli"
+    ]
+  },
+  "garlic": {
+    "category": "aromatic",
+    "cost_per_100g": 0.6,
+    "nutrition_per_100g": {
+      "calories": 149,
+      "protein_g": 6.4,
+      "carbs_g": 33.1,
+      "fat_g": 0.5,
+      "fiber_g": 2.1,
+      "sodium_mg": 17
+    },
+    "shelf_life_days": 30,
+    "substitutes": [
+      "onion"
+    ]
+  },
+  "soy sauce": {
+    "category": "condiment",
+    "cost_per_100g": 0.6,
+    "nutrition_per_100g": {
+      "calories": 53,
+      "protein_g": 8.1,
+      "carbs_g": 4.9,
+      "fat_g": 0.6,
+      "fiber_g": 0.8,
+      "sodium_mg": 5493
+    },
+    "shelf_life_days": 180,
+    "substitutes": []
+  },
+  "olive oil": {
+    "category": "cooking_fat",
+    "cost_per_100g": 1.8,
+    "nutrition_per_100g": {
+      "calories": 884,
+      "protein_g": 0.0,
+      "carbs_g": 0.0,
+      "fat_g": 100.0,
+      "fiber_g": 0.0,
+      "sodium_mg": 2
+    },
+    "shelf_life_days": 180,
+    "substitutes": []
+  },
+  "plain greek yogurt": {
+    "category": "dairy",
+    "cost_per_100g": 0.85,
+    "nutrition_per_100g": {
+      "calories": 59,
+      "protein_g": 10.0,
+      "carbs_g": 3.6,
+      "fat_g": 0.4,
+      "fiber_g": 0.0,
+      "sodium_mg": 36
+    },
+    "shelf_life_days": 7,
+    "substitutes": []
+  }
+}
