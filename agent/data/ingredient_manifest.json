@@ -1,0 +1,7 @@
+{
+  "source": "USDA FoodData Central Foundation/SR Legacy foods",
+  "generated_at": "2026-09-03",
+  "units": "values per 100g edible portion",
+  "nutrients": ["calories", "protein_g", "carbs_g", "fat_g", "fibre_g", "sodium_mg", "potassium_mg"],
+  "ingredients": ["brown rice", "canned chickpeas", "carrot", "chicken breast", "frozen spinach", "olive oil", "salmon", "tofu"]
+}

@@ -30,10 +30,17 @@ def append(existing: list | None, incoming: Any) -> list:
 
 
 class MealPlanState(TypedDict, total=False):
+    action: str
+    session_id: str
+    current_day: int
+    finished_meal_index: int
+    new_leftovers: list[dict]
     # --- Onboarding (fixed for the session) --------------------------------
     shopping_frequency_days: int
     budget: float
     supermarket: str
+    postal_code: str
+    preferred_store: str
     appliances: list[str]
     goal: str
     cuisine_preferences: list[str]
@@ -51,6 +58,8 @@ class MealPlanState(TypedDict, total=False):
     grocery_valid: bool
     grocery_feedback: str
     grocery_retry_count: int   # bounded by GROCERY_VALIDATION_MAX_RETRIES
+    estimated_grocery_cost: float
+    grocery_list_status: str  # "estimated" | "final"
 
     # --- Leftover tracking (cheap state updates, no LLM call) ------------
     leftover_ingredients: list[str]
@@ -59,6 +68,9 @@ class MealPlanState(TypedDict, total=False):
     # --- Rejection handling --------------------------------------------------
     rejection_reason_raw: str   # the user's typed reason, verbatim
     rejection_category: str     # "preference" | "constraint"
+    substitute_suggestion: dict
+    substitute_attempted: bool
+    substitute_accepted: bool
     rejected_meal_index: int    # which entry in `meals` is being reworked
 
     # --- Long-term memory (mirror of DynamoDB, loaded at session start) --

@@ -24,7 +24,7 @@ class IngredientLine(BaseModel):
 
     name: str = Field(description="Ingredient name, lowercase, matching the ingredient DB where possible")
     quantity: float = Field(gt=0, description="Amount used in this meal")
-    unit: str = Field(description="Unit for quantity, e.g. 'g', 'ml', 'pcs', 'tbsp'")
+    unit: Literal["g"] = Field(default="g", description="All recipe quantities are grams")
 
 
 class Nutrition(BaseModel):
@@ -38,8 +38,10 @@ class Nutrition(BaseModel):
     calories: float = Field(ge=0)
     protein_g: float = Field(ge=0)
     carbs_g: float = Field(ge=0)
-    fats_g: float = Field(ge=0)
-    fiber_g: float = Field(ge=0)
+    fat_g: float = Field(ge=0)
+    fibre_g: float = Field(ge=0)
+    sodium_mg: float = Field(ge=0)
+    potassium_mg: float = Field(ge=0)
 
 
 # ---------------------------------------------------------------------------
@@ -111,3 +113,14 @@ class GroceryList(BaseModel):
     estimated_total_cost: float = Field(ge=0)
     within_budget: bool = Field(description="Model's own check of total vs. the user's budget")
     shopping_day_index: int = Field(ge=0, description="Day index this shop covers")
+
+
+class RejectionExtraction(BaseModel):
+    category: Literal["preference", "constraint"]
+    learned_preference: str
+
+
+class SubstituteSuggestion(BaseModel):
+    original_ingredient: str
+    substitute_ingredient: str
+    reason: str
