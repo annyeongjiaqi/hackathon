@@ -23,7 +23,7 @@ from agent.constants import (
     MEAL_GENERATION_MAX_TOKENS,
     MEAL_GENERATION_TEMPERATURE,
 )
-from agent.schemas import MealPlan
+from agent.schemas import MealDraft, MealPlan
 from agent.state import MealPlanState
 from agent.tools.nutrition_calculator import _COUNT_ITEM_GRAMS, load_ingredients_db
 from agent.tools.shelf_life_rules import freshness_constraint_text
@@ -140,6 +140,24 @@ def _servings_for_household(living_alone_or_partner: str) -> int:
     return 1 if "alone" in (living_alone_or_partner or "").lower() else 2
 
 
+def _shared_rule_lines(countable_pantry: list[str], servings: int) -> list[str]:
+    """The ingredient / unit / appliance rules, identical for full-plan and
+    single-meal (scoped regeneration) prompts."""
+    return [
+        "- HARD RULE: use ONLY ingredient names from the allowed pantry list above "
+        "(lowercase, exact match). Do NOT invent, rename, or substitute any ingredient "
+        "that is not shown there.",
+        "- appliances_used must be a subset of the available appliances.",
+        "- UNITS: 'pcs' or 'piece' may be used ONLY for these countable ingredients: "
+        f"{countable_pantry or 'none'}. Every other solid ingredient MUST use 'g' "
+        "(or 'kg'); every liquid, oil, or condiment MUST use 'ml', 'tbsp', 'tsp', "
+        "or 'cup'. (e.g. soy sauce -> 'ml' or 'tbsp', never 'pcs'.)",
+        "- Give realistic quantities; the nutrition DB is gram-based.",
+        "- Leave nutrition null; it is computed downstream.",
+        f"- servings = {servings} for every meal.",
+    ]
+
+
 def build_messages(state: MealPlanState) -> list[tuple[str, str]]:
     """Assemble the (system, human) message list for the model call."""
     total_plan_days = int(state.get("shopping_frequency_days") or 7)
@@ -178,18 +196,8 @@ def build_messages(state: MealPlanState) -> list[tuple[str, str]]:
         json.dumps(recipe_sample, indent=2),
         "",
         "Rules:",
-        "- HARD RULE: use ONLY ingredient names from the allowed pantry list above "
-        "(lowercase, exact match). Do NOT invent, rename, or substitute any ingredient "
-        "that is not shown there.",
         "- Exactly one meal per day_index, no gaps, no duplicates of day_index.",
-        "- appliances_used must be a subset of the available appliances.",
-        "- UNITS: 'pcs' or 'piece' may be used ONLY for these countable ingredients: "
-        f"{countable_pantry or 'none'}. Every other solid ingredient MUST use 'g' "
-        "(or 'kg'); every liquid, oil, or condiment MUST use 'ml', 'tbsp', 'tsp', "
-        "or 'cup'. (e.g. soy sauce -> 'ml' or 'tbsp', never 'pcs'.)",
-        "- Give realistic quantities; the nutrition DB is gram-based.",
-        "- Leave nutrition null; it is computed downstream.",
-        f"- servings = {servings} for every meal.",
+        *_shared_rule_lines(countable_pantry, servings),
     ]
 
     feedback = (state.get("meals_feedback") or "").strip()
@@ -228,6 +236,94 @@ def creative_meals_node(state: MealPlanState) -> dict:
         "meals_retry_count": attempt,
         "log": [f"creative_meals: attempt {attempt}, generated {len(meals)} meal(s)"],
     }
+
+
+# --------------------------------------------------------------------------- #
+# Scoped single-meal regeneration (used by the rejection-handling flow)
+# --------------------------------------------------------------------------- #
+
+SINGLE_MEAL_SYSTEM_PROMPT = (
+    "You are a meal-planning assistant fixing ONE meal in an existing plan. "
+    "You return a single replacement meal that honours the same constraints as the "
+    "rest of the plan (pantry, appliances, servings, units) while resolving the "
+    "specific objection the user raised about the meal being replaced. "
+    "Use ONLY exact ingredient names from the allowed pantry list; never invent one."
+)
+
+
+def build_single_meal_messages(
+    state: MealPlanState,
+    meal_index: int,
+    guidance: str,
+) -> list[tuple[str, str]]:
+    """Prompt for regenerating just ``state['meals'][meal_index]``.
+
+    ``guidance`` is the actionable objection (usually the extracted rejection
+    reason summary) the replacement must resolve.
+    """
+    meals = state.get("meals") or []
+    rejected = meals[meal_index]
+    day_index = rejected.get("day_index", meal_index)
+
+    total_plan_days = int(state.get("shopping_frequency_days") or 7)
+    appliances = state.get("appliances") or []
+    cuisine_preferences = state.get("cuisine_preferences") or []
+    goal = state.get("goal") or "general healthy eating"
+    dietary_restrictions = state.get("dietary_restrictions") or []
+    household = state.get("living_alone_or_partner") or "partner"
+    servings = _servings_for_household(household)
+
+    allowed_pantry = sorted(load_ingredients_db().keys())
+    countable_pantry = sorted(set(_COUNT_ITEM_GRAMS) & set(allowed_pantry))
+    freshness = freshness_constraint_text(total_plan_days)
+
+    other_meals = [m.get("name", "?") for i, m in enumerate(meals) if i != meal_index]
+
+    lines = [
+        f"Replace exactly ONE meal: day_index {day_index}.",
+        f"Household: {household} -> cook {servings} serving(s).",
+        f"Nutrition / health goal: {goal}.",
+        f"Dietary restrictions (hard): {dietary_restrictions or 'none'}.",
+        f"Available kitchen appliances (ONLY these): {appliances or 'basic stovetop'}.",
+        f"Cuisine preferences: {cuisine_preferences or 'no strong preference'}.",
+        "",
+        "Shelf-life constraint:",
+        f"  {freshness}",
+        "",
+        "Allowed pantry - every ingredient you use MUST be one of these exact names:",
+        f"  {allowed_pantry}",
+        "",
+        "The meal being replaced (do NOT reproduce it; resolve the objection below):",
+        json.dumps(
+            {k: rejected.get(k) for k in ("name", "ingredients", "appliances_used",
+                                          "estimated_prep_minutes")},
+            indent=2,
+        ),
+        "",
+        f"User's objection to fix: {guidance}",
+        "",
+        f"Keep it distinct from the other meals in the plan: {other_meals}.",
+        "",
+        "Rules:",
+        f"- Return ONE meal with day_index = {day_index}.",
+        *_shared_rule_lines(countable_pantry, servings),
+    ]
+    return [("system", SINGLE_MEAL_SYSTEM_PROMPT), ("human", "\n".join(lines))]
+
+
+def regenerate_single_meal(state: MealPlanState, meal_index: int, guidance: str) -> dict:
+    """Scoped Creative(meals) call: one replacement meal for ``meal_index``.
+
+    Returns a ``Meal``-shaped dict with ``nutrition`` left null - the caller
+    recalculates it deterministically, no LLM. Does not mutate state.
+    """
+    messages = build_single_meal_messages(state, meal_index, guidance)
+    draft: MealDraft = _build_model().with_structured_output(MealDraft).invoke(messages)
+
+    data = draft.to_meal_dict()
+    # pin the slot regardless of what the model returned
+    data["day_index"] = (state.get("meals") or [])[meal_index].get("day_index", meal_index)
+    return data
 
 
 if __name__ == "__main__":  # prompt-only smoke test (no Bedrock call)

@@ -1,4 +1,6 @@
-"""LangGraph wiring for the meal-plan + grocery-list pipeline (roadmap flows #1 and #2).
+"""LangGraph wiring for the triggered flows.
+
+Flow #1 + #2 - initial generation pipeline (``MEAL_PLAN_GRAPH``):
 
     START
       -> creative_meals
@@ -10,13 +12,20 @@
            -> (over budget & retries left) loop back to creative_grocery
            -> (within budget, or retries spent) END
 
-Both retry loops are bounded (MEAL_VALIDATION_MAX_RETRIES /
-GROCERY_VALIDATION_MAX_RETRIES); when a budget is spent the graph moves on with
-the last attempt rather than looping forever (roadmap Key Risk #3).
+Flow #3 - rejection handling (``REJECTION_GRAPH``), a SEPARATE entry point that
+fires when the user rejects one meal (identified by ``rejected_meal_index``):
 
-An InMemorySaver checkpointer is attached so all flows share session state
-(thread_id = user session id). DynamoDB long-term memory and the rejection /
-Personalized flows are deliberately NOT wired here yet.
+    START
+      -> extraction_rejection            (LLM: classify into 2 branches)
+           -> preference_fixable  -> propose_substitution
+                                        -> swap applied  -> END
+                                        -> not usable    -> regenerate_meal -> END
+           -> constraint_violated -> regenerate_meal -> END
+
+Retry loops in the pipeline are bounded (MEAL_VALIDATION_MAX_RETRIES /
+GROCERY_VALIDATION_MAX_RETRIES). Both graphs attach an InMemorySaver so flows
+share session state (thread_id = user session id). The Personalized / DynamoDB
+write and the leftover-report regeneration trigger are NOT wired here yet.
 """
 
 from __future__ import annotations
@@ -29,6 +38,13 @@ from agent.nodes.creative_grocery import creative_grocery_node
 from agent.nodes.creative_meals import creative_meals_node
 from agent.nodes.decision_support_grocery import decision_support_grocery_node
 from agent.nodes.decision_support_meals import decision_support_meals_node
+from agent.nodes.extraction_rejection import extraction_rejection_node
+from agent.nodes.rejection_router import (
+    propose_substitution_node,
+    regenerate_rejected_meal_node,
+    route_after_extraction,
+    route_after_substitution,
+)
 from agent.state import MealPlanState
 
 
@@ -78,7 +94,33 @@ def build_meal_plan_graph(checkpointer: InMemorySaver | None = None):
 MEAL_PLAN_GRAPH = build_meal_plan_graph()
 
 
-if __name__ == "__main__":  # end-to-end demo — makes real Bedrock calls
+def build_rejection_graph(checkpointer: InMemorySaver | None = None):
+    """Flow #3: classify a meal rejection and either substitute or regenerate it."""
+    graph = StateGraph(MealPlanState)
+    graph.add_node("extraction_rejection", extraction_rejection_node)
+    graph.add_node("propose_substitution", propose_substitution_node)
+    graph.add_node("regenerate_meal", regenerate_rejected_meal_node)
+
+    graph.add_edge(START, "extraction_rejection")
+    graph.add_conditional_edges(
+        "extraction_rejection",
+        route_after_extraction,
+        {"substitution": "propose_substitution", "regeneration": "regenerate_meal"},
+    )
+    graph.add_conditional_edges(
+        "propose_substitution",
+        route_after_substitution,
+        {"done": END, "regeneration": "regenerate_meal"},
+    )
+    graph.add_edge("regenerate_meal", END)
+
+    return graph.compile(checkpointer=checkpointer or InMemorySaver())
+
+
+REJECTION_GRAPH = build_rejection_graph()
+
+
+def _pipeline_demo() -> None:  # end-to-end demo — makes real Bedrock calls
     import json
     import uuid
 
@@ -151,3 +193,108 @@ if __name__ == "__main__":  # end-to-end demo — makes real Bedrock calls
 
     print("\n=== raw grocery JSON ===")
     print(json.dumps(final_state.get("grocery_list", []), indent=2))
+
+
+# A meal plan resembling a real successful pipeline run, so the rejection demo
+# does not have to spend two LLM calls regenerating one first.
+_DEMO_PLAN: list[dict] = [
+    {"name": "Garlic Chicken with Broccoli and Brown Rice", "day_index": 0, "servings": 1,
+     "ingredients": [{"name": "chicken breast", "quantity": 150, "unit": "g"},
+                     {"name": "broccoli", "quantity": 200, "unit": "g"},
+                     {"name": "brown rice", "quantity": 75, "unit": "g"},
+                     {"name": "garlic", "quantity": 5, "unit": "pcs"},
+                     {"name": "olive oil", "quantity": 2, "unit": "tbsp"}],
+     "appliances_used": ["stovetop"], "estimated_prep_minutes": 30, "status": "pending"},
+    {"name": "Soy Tofu Stir-Fry with Carrot and Onion", "day_index": 1, "servings": 1,
+     "ingredients": [{"name": "firm tofu", "quantity": 200, "unit": "g"},
+                     {"name": "carrot", "quantity": 150, "unit": "g"},
+                     {"name": "onion", "quantity": 100, "unit": "g"},
+                     {"name": "soy sauce", "quantity": 2, "unit": "tbsp"},
+                     {"name": "olive oil", "quantity": 2, "unit": "tbsp"}],
+     "appliances_used": ["stovetop"], "estimated_prep_minutes": 25, "status": "pending"},
+    {"name": "Oven Chicken with Sweet Potato and Broccoli", "day_index": 2, "servings": 1,
+     "ingredients": [{"name": "chicken breast", "quantity": 150, "unit": "g"},
+                     {"name": "sweet potato", "quantity": 150, "unit": "g"},
+                     {"name": "broccoli", "quantity": 150, "unit": "g"},
+                     {"name": "olive oil", "quantity": 2, "unit": "tbsp"}],
+     "appliances_used": ["oven"], "estimated_prep_minutes": 40, "status": "pending"},
+    {"name": "Egg and Spinach Scramble with Tomato", "day_index": 3, "servings": 1,
+     "ingredients": [{"name": "egg", "quantity": 3, "unit": "pcs"},
+                     {"name": "spinach", "quantity": 100, "unit": "g"},
+                     {"name": "tomato", "quantity": 150, "unit": "g"},
+                     {"name": "olive oil", "quantity": 1, "unit": "tbsp"}],
+     "appliances_used": ["stovetop"], "estimated_prep_minutes": 15, "status": "pending"},
+]
+
+
+def _rejection_demo() -> None:  # makes real Bedrock calls (1 per rejection)
+    import uuid
+
+    from dotenv import load_dotenv
+
+    load_dotenv()
+
+    onboarding = {
+        "budget": 55.0,
+        "goal": "high protein, around 1800 kcal/day, more vegetables and fibre",
+        "dietary_restrictions": ["no pork", "no shellfish"],
+        "appliances": ["microwave", "stovetop"],   # note: NO oven
+        "cuisine_preferences": ["mediterranean", "japanese"],
+        "living_alone_or_partner": "alone",
+        "shopping_frequency_days": 4,
+        "supermarket": "FairPrice",
+    }
+
+    scenarios = [
+        (0, "I'm vegetarian - can this be made without the meat?",
+         "preference-based, named ingredient -> expect a clean substitution"),
+        (0, "way too much garlic for me",
+         "preference-based, no curated swap -> expect fallback to regeneration"),
+        (2, "I don't have an oven",
+         "constraint-based -> expect single-meal regeneration"),
+    ]
+
+    for meal_index, raw_reason, note in scenarios:
+        state: MealPlanState = {
+            **onboarding,
+            "meals": [dict(m) for m in _DEMO_PLAN],
+            "rejected_meal_index": meal_index,
+            "rejection_reason_raw": raw_reason,
+        }
+        before = state["meals"][meal_index]
+        cfg = {"configurable": {"thread_id": f"reject-{uuid.uuid4().hex[:8]}"}}
+
+        print("=" * 74)
+        print(f"REJECT meal {meal_index} (day {before['day_index']}): {before['name']}")
+        print(f'  reason: "{raw_reason}"   [{note}]')
+        print(f"  before ingredients: {[i['name'] for i in before['ingredients']]}")
+        print("=" * 74)
+
+        out = REJECTION_GRAPH.invoke(state, config=cfg)
+
+        for entry in out.get("log", []):
+            print("  -", entry)
+
+        after = out["meals"][meal_index]
+        print(f"\n  category        : {out.get('rejection_category')}")
+        print(f"  reason_summary  : {out.get('rejection_reason_summary')}")
+        print(f"  target_ingredient: {out.get('rejection_target_ingredient') or '(none)'}")
+        print(f"  outcome         : {out.get('rejection_outcome')}")
+        print(f"\n  AFTER  day {after['day_index']}: {after['name']}")
+        print(f"    ingredients: {[i['name'] + ' ' + str(i['quantity']) + i['unit'] for i in after['ingredients']]}")
+        print(f"    appliances : {after.get('appliances_used')}")
+        n = after.get("nutrition") or {}
+        if n:
+            print(f"    nutrition  : {n['calories']:.0f} kcal | {n['protein_g']:.0f}g protein | "
+                  f"{n['carbs_g']:.0f}g carbs | {n['fats_g']:.0f}g fat | {n['fiber_g']:.0f}g fibre")
+        print()
+
+
+if __name__ == "__main__":
+    import sys
+
+    demo = sys.argv[1] if len(sys.argv) > 1 else "pipeline"
+    if demo == "rejection":
+        _rejection_demo()
+    else:
+        _pipeline_demo()

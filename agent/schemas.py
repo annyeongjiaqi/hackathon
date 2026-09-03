@@ -68,6 +68,28 @@ class Meal(BaseModel):
     )
 
 
+class MealDraft(BaseModel):
+    """The LLM-authored part of a meal - everything except downstream-computed
+    fields. Used for scoped single-meal regeneration so the model is never asked
+    to emit ``nutrition`` (which trips structured-output validation) or ``status``.
+    """
+
+    name: str = Field(description="Dish name")
+    day_index: int = Field(ge=0, description="0-based day this meal is planned for")
+    servings: int = Field(default=2, ge=1)
+    ingredients: list[IngredientLine] = Field(min_length=1)
+    steps: list[str] = Field(default_factory=list, description="Short ordered cooking steps")
+    appliances_used: list[str] = Field(
+        default_factory=list,
+        description="Appliances this recipe needs; must be a subset of the user's appliances",
+    )
+    estimated_prep_minutes: int = Field(ge=0, description="Rough total hands-on + cook time")
+
+    def to_meal_dict(self) -> dict:
+        """As a ``Meal``-shaped dict with the computed fields left for downstream."""
+        return {**self.model_dump(), "nutrition": None, "status": "pending"}
+
+
 class MealPlan(BaseModel):
     """Full structured output of Creative(meals).
 
@@ -115,3 +137,38 @@ class GroceryList(BaseModel):
     estimated_total_cost: float = Field(ge=0)
     within_budget: bool = Field(description="Model's own check of total vs. the user's budget")
     shopping_day_index: int = Field(ge=0, description="Day index this shop covers")
+
+
+# ---------------------------------------------------------------------------
+# Extraction(rejection reason) output
+# ---------------------------------------------------------------------------
+
+
+class RejectionAssessment(BaseModel):
+    """Structured output of the Extraction(rejection reason) node.
+
+    Two branches only (roadmap "Rejection Handling: Two Branches, Not One"):
+    a preference complaint that a single swap might fix, versus a recipe that is
+    fundamentally wrong for this household and needs full regeneration.
+    """
+
+    category: Literal["preference_fixable", "constraint_violated"] = Field(
+        description=(
+            "'preference_fixable': dislikes a specific ingredient, the spice level, or the "
+            "cuisine - a substitution could plausibly fix it. "
+            "'constraint_violated': the recipe cannot work for this household as written - "
+            "needs equipment they do not have, takes too long, or the portion size is wrong."
+        )
+    )
+    reason_summary: str = Field(
+        description="One short, neutral sentence capturing what the user objected to."
+    )
+    target_ingredient: str | None = Field(
+        default=None,
+        description=(
+            "Only for a 'preference_fixable' complaint about one ingredient: the single "
+            "ingredient name to swap out, copied exactly (lowercase) from the rejected "
+            "meal's ingredient list. Null for spice-level/cuisine complaints or when "
+            "'constraint_violated'."
+        ),
+    )

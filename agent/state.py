@@ -57,9 +57,12 @@ class MealPlanState(TypedDict, total=False):
     days_until_next_shopping: int
 
     # --- Rejection handling --------------------------------------------------
-    rejection_reason_raw: str   # the user's typed reason, verbatim
-    rejection_category: str     # "preference" | "constraint"
-    rejected_meal_index: int    # which entry in `meals` is being reworked
+    rejection_reason_raw: str        # the user's typed reason, verbatim
+    rejected_meal_index: int         # which entry in `meals` is being reworked
+    rejection_category: str          # "preference_fixable" | "constraint_violated" (set by extraction)
+    rejection_reason_summary: str    # short extracted objection (set by extraction)
+    rejection_target_ingredient: str  # ingredient to swap, if any (set by extraction)
+    rejection_outcome: str           # "substituted" | "regenerated" (set by the router)
 
     # --- Long-term memory (mirror of DynamoDB, loaded at session start) --
     learned_preferences: list[str]
