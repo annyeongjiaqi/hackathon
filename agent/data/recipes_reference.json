@@ -1,0 +1,483 @@
+[
+  {
+    "name": "Garlic Chicken with Broccoli",
+    "cuisine": "western",
+    "nutrition_profile": "high-protein_low-carb",
+    "ingredients": [
+      {
+        "name": "chicken breast",
+        "quantity": 400,
+        "unit": "g"
+      },
+      {
+        "name": "broccoli",
+        "quantity": 250,
+        "unit": "g"
+      },
+      {
+        "name": "garlic",
+        "quantity": 12,
+        "unit": "g"
+      },
+      {
+        "name": "olive oil",
+        "quantity": 15,
+        "unit": "g"
+      }
+    ],
+    "appliances_used": [
+      "stovetop"
+    ],
+    "estimated_prep_minutes": 25,
+    "difficulty": "easy",
+    "cost_estimate_sgd": 9.59
+  },
+  {
+    "name": "Soy Chicken Brown Rice Bowl",
+    "cuisine": "asian",
+    "nutrition_profile": "balanced_high-protein",
+    "ingredients": [
+      {
+        "name": "chicken breast",
+        "quantity": 300,
+        "unit": "g"
+      },
+      {
+        "name": "brown rice",
+        "quantity": 300,
+        "unit": "g"
+      },
+      {
+        "name": "broccoli",
+        "quantity": 180,
+        "unit": "g"
+      },
+      {
+        "name": "carrot",
+        "quantity": 120,
+        "unit": "g"
+      },
+      {
+        "name": "soy sauce",
+        "quantity": 25,
+        "unit": "g"
+      },
+      {
+        "name": "garlic",
+        "quantity": 10,
+        "unit": "g"
+      }
+    ],
+    "appliances_used": [
+      "stovetop"
+    ],
+    "estimated_prep_minutes": 30,
+    "difficulty": "easy",
+    "cost_estimate_sgd": 8.52
+  },
+  {
+    "name": "Tomato Spinach Egg Scramble",
+    "cuisine": "western",
+    "nutrition_profile": "high-protein_low-carb",
+    "ingredients": [
+      {
+        "name": "egg",
+        "quantity": 240,
+        "unit": "g"
+      },
+      {
+        "name": "spinach",
+        "quantity": 120,
+        "unit": "g"
+      },
+      {
+        "name": "tomato",
+        "quantity": 180,
+        "unit": "g"
+      },
+      {
+        "name": "onion",
+        "quantity": 80,
+        "unit": "g"
+      },
+      {
+        "name": "olive oil",
+        "quantity": 10,
+        "unit": "g"
+      }
+    ],
+    "appliances_used": [
+      "stovetop"
+    ],
+    "estimated_prep_minutes": 15,
+    "difficulty": "easy",
+    "cost_estimate_sgd": 3.48
+  },
+  {
+    "name": "Garlic Tofu Broccoli Stir-Fry",
+    "cuisine": "chinese-inspired",
+    "nutrition_profile": "balanced_plant-protein",
+    "ingredients": [
+      {
+        "name": "firm tofu",
+        "quantity": 400,
+        "unit": "g"
+      },
+      {
+        "name": "broccoli",
+        "quantity": 220,
+        "unit": "g"
+      },
+      {
+        "name": "carrot",
+        "quantity": 120,
+        "unit": "g"
+      },
+      {
+        "name": "onion",
+        "quantity": 100,
+        "unit": "g"
+      },
+      {
+        "name": "soy sauce",
+        "quantity": 30,
+        "unit": "g"
+      },
+      {
+        "name": "garlic",
+        "quantity": 12,
+        "unit": "g"
+      },
+      {
+        "name": "olive oil",
+        "quantity": 10,
+        "unit": "g"
+      }
+    ],
+    "appliances_used": [
+      "stovetop"
+    ],
+    "estimated_prep_minutes": 25,
+    "difficulty": "easy",
+    "cost_estimate_sgd": 5.46
+  },
+  {
+    "name": "Oven Chicken Sweet Potato Tray Bake",
+    "cuisine": "western",
+    "nutrition_profile": "balanced_high-protein",
+    "ingredients": [
+      {
+        "name": "chicken breast",
+        "quantity": 400,
+        "unit": "g"
+      },
+      {
+        "name": "sweet potato",
+        "quantity": 350,
+        "unit": "g"
+      },
+      {
+        "name": "broccoli",
+        "quantity": 200,
+        "unit": "g"
+      },
+      {
+        "name": "onion",
+        "quantity": 100,
+        "unit": "g"
+      },
+      {
+        "name": "garlic",
+        "quantity": 10,
+        "unit": "g"
+      },
+      {
+        "name": "olive oil",
+        "quantity": 18,
+        "unit": "g"
+      }
+    ],
+    "appliances_used": [
+      "oven"
+    ],
+    "estimated_prep_minutes": 40,
+    "difficulty": "easy",
+    "cost_estimate_sgd": 10.56
+  },
+  {
+    "name": "Oven Soy Tofu and Sweet Potato",
+    "cuisine": "asian-inspired",
+    "nutrition_profile": "balanced_plant-protein",
+    "ingredients": [
+      {
+        "name": "firm tofu",
+        "quantity": 400,
+        "unit": "g"
+      },
+      {
+        "name": "sweet potato",
+        "quantity": 350,
+        "unit": "g"
+      },
+      {
+        "name": "carrot",
+        "quantity": 150,
+        "unit": "g"
+      },
+      {
+        "name": "soy sauce",
+        "quantity": 25,
+        "unit": "g"
+      },
+      {
+        "name": "garlic",
+        "quantity": 10,
+        "unit": "g"
+      },
+      {
+        "name": "olive oil",
+        "quantity": 15,
+        "unit": "g"
+      }
+    ],
+    "appliances_used": [
+      "oven"
+    ],
+    "estimated_prep_minutes": 40,
+    "difficulty": "easy",
+    "cost_estimate_sgd": 3.63
+  },
+  {
+    "name": "Microwave Savoury Egg Oats",
+    "cuisine": "asian-inspired",
+    "nutrition_profile": "balanced",
+    "ingredients": [
+      {
+        "name": "rolled oats",
+        "quantity": 100,
+        "unit": "g"
+      },
+      {
+        "name": "egg",
+        "quantity": 120,
+        "unit": "g"
+      },
+      {
+        "name": "spinach",
+        "quantity": 80,
+        "unit": "g"
+      },
+      {
+        "name": "tomato",
+        "quantity": 100,
+        "unit": "g"
+      },
+      {
+        "name": "soy sauce",
+        "quantity": 15,
+        "unit": "g"
+      }
+    ],
+    "appliances_used": [
+      "microwave"
+    ],
+    "estimated_prep_minutes": 10,
+    "difficulty": "easy",
+    "cost_estimate_sgd": 2.26
+  },
+  {
+    "name": "Microwave Tuna Sweet Potato Bowl",
+    "cuisine": "western",
+    "nutrition_profile": "high-protein",
+    "ingredients": [
+      {
+        "name": "sweet potato",
+        "quantity": 350,
+        "unit": "g"
+      },
+      {
+        "name": "canned tuna",
+        "quantity": 200,
+        "unit": "g"
+      },
+      {
+        "name": "plain greek yogurt",
+        "quantity": 100,
+        "unit": "g"
+      },
+      {
+        "name": "spinach",
+        "quantity": 80,
+        "unit": "g"
+      },
+      {
+        "name": "tomato",
+        "quantity": 120,
+        "unit": "g"
+      }
+    ],
+    "appliances_used": [
+      "microwave"
+    ],
+    "estimated_prep_minutes": 15,
+    "difficulty": "easy",
+    "cost_estimate_sgd": 6.75
+  },
+  {
+    "name": "Microwave Chicken Brown Rice Bowl",
+    "cuisine": "asian",
+    "nutrition_profile": "balanced_high-protein",
+    "ingredients": [
+      {
+        "name": "chicken breast",
+        "quantity": 250,
+        "unit": "g"
+      },
+      {
+        "name": "brown rice",
+        "quantity": 300,
+        "unit": "g"
+      },
+      {
+        "name": "spinach",
+        "quantity": 100,
+        "unit": "g"
+      },
+      {
+        "name": "carrot",
+        "quantity": 100,
+        "unit": "g"
+      },
+      {
+        "name": "soy sauce",
+        "quantity": 20,
+        "unit": "g"
+      }
+    ],
+    "appliances_used": [
+      "microwave"
+    ],
+    "estimated_prep_minutes": 12,
+    "difficulty": "easy",
+    "cost_estimate_sgd": 5.92
+  },
+  {
+    "name": "Chicken Tomato Spinach Skillet",
+    "cuisine": "mediterranean-inspired",
+    "nutrition_profile": "high-protein_low-carb",
+    "ingredients": [
+      {
+        "name": "chicken breast",
+        "quantity": 350,
+        "unit": "g"
+      },
+      {
+        "name": "tomato",
+        "quantity": 250,
+        "unit": "g"
+      },
+      {
+        "name": "spinach",
+        "quantity": 150,
+        "unit": "g"
+      },
+      {
+        "name": "onion",
+        "quantity": 100,
+        "unit": "g"
+      },
+      {
+        "name": "garlic",
+        "quantity": 12,
+        "unit": "g"
+      },
+      {
+        "name": "olive oil",
+        "quantity": 15,
+        "unit": "g"
+      }
+    ],
+    "appliances_used": [
+      "stovetop"
+    ],
+    "estimated_prep_minutes": 25,
+    "difficulty": "easy",
+    "cost_estimate_sgd": 8.29
+  },
+  {
+    "name": "Tuna Egg Brown Rice Bowl",
+    "cuisine": "japanese-inspired",
+    "nutrition_profile": "high-protein_balanced",
+    "ingredients": [
+      {
+        "name": "canned tuna",
+        "quantity": 160,
+        "unit": "g"
+      },
+      {
+        "name": "egg",
+        "quantity": 120,
+        "unit": "g"
+      },
+      {
+        "name": "brown rice",
+        "quantity": 300,
+        "unit": "g"
+      },
+      {
+        "name": "spinach",
+        "quantity": 100,
+        "unit": "g"
+      },
+      {
+        "name": "soy sauce",
+        "quantity": 20,
+        "unit": "g"
+      }
+    ],
+    "appliances_used": [
+      "stovetop"
+    ],
+    "estimated_prep_minutes": 20,
+    "difficulty": "easy",
+    "cost_estimate_sgd": 5.24
+  },
+  {
+    "name": "Greek Yogurt Savoury Oat Bowl",
+    "cuisine": "mediterranean-inspired",
+    "nutrition_profile": "balanced",
+    "ingredients": [
+      {
+        "name": "rolled oats",
+        "quantity": 100,
+        "unit": "g"
+      },
+      {
+        "name": "plain greek yogurt",
+        "quantity": 180,
+        "unit": "g"
+      },
+      {
+        "name": "tomato",
+        "quantity": 150,
+        "unit": "g"
+      },
+      {
+        "name": "spinach",
+        "quantity": 80,
+        "unit": "g"
+      },
+      {
+        "name": "egg",
+        "quantity": 100,
+        "unit": "g"
+      }
+    ],
+    "appliances_used": [
+      "microwave"
+    ],
+    "estimated_prep_minutes": 12,
+    "difficulty": "easy",
+    "cost_estimate_sgd": 3.88
+  }
+]
