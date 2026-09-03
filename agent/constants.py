@@ -25,14 +25,18 @@ DEFAULT_MODEL_ID = BEDROCK_MODEL_ID_HAIKU
 # AWS
 # ---------------------------------------------------------------------------
 
+import os
+
 # Region for both Bedrock and DynamoDB. Also present in .env as AWS_REGION /
 # AWS_DEFAULT_REGION; kept here too so code paths that don't load .env still agree.
-AWS_REGION = "us-east-1"
+AWS_REGION = os.getenv("AWS_REGION", os.getenv("AWS_DEFAULT_REGION", "us-east-1"))
 
 # DynamoDB table holding long-term, cross-session learned preferences.
 # Partition key: session_id. On-demand billing. Separate from the LangGraph
 # checkpointer (which is short-term, per-session state only).
-DYNAMODB_TABLE_NAME = "user_preferences"
+DYNAMODB_TABLE_NAME = os.getenv("DYNAMODB_TABLE_NAME", "user_preferences")
+AGENT_SERVER_URL = os.getenv("AGENT_SERVER_URL", "http://localhost:8080/invocations")
+GROCERY_GENERATION_WINDOW_DAYS = int(os.getenv("GROCERY_GENERATION_WINDOW_DAYS", "2"))
 
 # ---------------------------------------------------------------------------
 # Retry limits for the validation feedback loops
