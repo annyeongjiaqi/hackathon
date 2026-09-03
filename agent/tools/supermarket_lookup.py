@@ -114,8 +114,8 @@ def categorize_grocery_list(grocery_list: GroceryList) -> GroceryList:
 
 
 if __name__ == "__main__":  # smoke test
-    assert get_category("chicken breast") == "meat"          # exact map hit
-    assert get_category("Chicken Thigh") == "meat"           # case-insensitive
+    assert get_category("chicken breast") in ("meat", "meat_poultry")  # DB file or placeholder map
+    assert get_category("Chicken Thigh") == "meat"           # not in DB -> keyword rule, case-insensitive
     assert get_category("frozen peas") == "frozen"           # exact + would also keyword
     assert get_category("smoked salmon") == "seafood"        # keyword rule
     assert get_category("wholemeal bread") == "bakery"       # keyword rule
@@ -136,5 +136,9 @@ if __name__ == "__main__":  # smoke test
     )
     out = categorize_grocery_list(gl)
     print("categorized:", [(i.name, i.category) for i in out.items])
-    assert [i.category for i in out.items] == ["meat", "frozen", "other"]
+    cats = [i.category for i in out.items]
+    # 'chicken breast' resolves via ingredients_db.json if present ('meat_poultry'),
+    # otherwise via the placeholder map / keyword rule ('meat').
+    assert cats[0] in ("meat", "meat_poultry")
+    assert cats[1] == "frozen" and cats[2] == "other"
     print("supermarket_lookup smoke test OK")

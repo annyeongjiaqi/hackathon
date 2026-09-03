@@ -25,7 +25,7 @@ from agent.constants import (
 )
 from agent.schemas import MealPlan
 from agent.state import MealPlanState
-from agent.tools.nutrition_calculator import load_ingredients_db
+from agent.tools.nutrition_calculator import _COUNT_ITEM_GRAMS, load_ingredients_db
 from agent.tools.shelf_life_rules import freshness_constraint_text
 
 RECIPES_REFERENCE_PATH = Path(__file__).resolve().parent.parent / "data" / "recipes_reference.json"
@@ -65,7 +65,8 @@ SYSTEM_PROMPT = (
     "You are a practical meal-planning assistant for a health-focused household. "
     "You design simple, realistic dinner plans that respect a fixed grocery budget, "
     "the household's kitchen equipment, dietary restrictions, and ingredient shelf life. "
-    "You only use ingredients from the allowed pantry list you are given. "
+    "You use ONLY the exact ingredient names from the allowed pantry list you are given - "
+    "never invent, rename, or substitute an ingredient that is not on that list. "
     "You return exactly one meal per day for the requested number of days."
 )
 
@@ -78,6 +79,32 @@ def load_recipes_reference(path: Path = RECIPES_REFERENCE_PATH) -> list[dict]:
         if data:
             return data
     return PLACEHOLDER_RECIPES_REFERENCE
+
+
+def _normalize_recipe(recipe: dict) -> dict:
+    """Reduce either recipe shape to a compact uniform dict for the prompt.
+
+    Handles the placeholder shape (``ingredients`` = list of names, ``appliances``,
+    ``approx_prep_minutes``, ``tags``) and the data-team shape (``ingredients`` =
+    list of ``{name, quantity, unit}``, ``appliances_used``,
+    ``estimated_prep_minutes``, ``nutrition_profile``, ``difficulty``).
+    """
+    raw_ings = recipe.get("ingredients", [])
+    names = [i["name"] if isinstance(i, dict) else i for i in raw_ings]
+
+    tags = list(recipe.get("tags", []))
+    for extra in (recipe.get("nutrition_profile"), recipe.get("difficulty")):
+        if extra and extra not in tags:
+            tags.append(extra)
+
+    return {
+        "name": recipe.get("name", "unnamed"),
+        "cuisine": recipe.get("cuisine", "generic"),
+        "ingredients": names,
+        "appliances": recipe.get("appliances") or recipe.get("appliances_used") or [],
+        "prep_minutes": recipe.get("approx_prep_minutes") or recipe.get("estimated_prep_minutes"),
+        "tags": tags,
+    }
 
 
 def _sample_recipes(
@@ -93,18 +120,19 @@ def _sample_recipes(
     """
     prefs = {c.strip().lower() for c in cuisine_preferences}
     restr = " ".join(dietary_restrictions).lower()
+    normalized = [_normalize_recipe(r) for r in recipes]
 
     def clashes(recipe: dict) -> bool:
-        tags = {t.lower() for t in recipe.get("tags", [])}
+        tags = {t.lower() for t in recipe["tags"]}
         text = (recipe["name"] + " " + " ".join(recipe["ingredients"])).lower()
         if "vegetarian" in restr or "vegan" in restr:
             if tags & {"vegetarian", "vegan"}:
                 return False
-            return any(m in text for m in ("chicken", "salmon", "beef", "pork", "fish", "egg"))
+            return any(m in text for m in ("chicken", "salmon", "tuna", "beef", "pork", "fish", "egg"))
         return False
 
-    preferred = [r for r in recipes if r.get("cuisine", "").lower() in prefs and not clashes(r)]
-    rest = [r for r in recipes if r not in preferred and not clashes(r)]
+    preferred = [r for r in normalized if r["cuisine"].lower() in prefs and not clashes(r)]
+    rest = [r for r in normalized if r not in preferred and not clashes(r)]
     return (preferred + rest)[:limit]
 
 
@@ -124,6 +152,10 @@ def build_messages(state: MealPlanState) -> list[tuple[str, str]]:
     servings = _servings_for_household(household)
 
     allowed_pantry = sorted(load_ingredients_db().keys())
+    # Single source of truth for which ingredients may carry a "pcs"/"piece" unit:
+    # the keys of nutrition_calculator._COUNT_ITEM_GRAMS, intersected with the
+    # pantry actually offered here.
+    countable_pantry = sorted(set(_COUNT_ITEM_GRAMS) & set(allowed_pantry))
     recipe_sample = _sample_recipes(load_recipes_reference(), cuisine_preferences, dietary_restrictions)
     freshness = freshness_constraint_text(total_plan_days)
 
@@ -146,10 +178,16 @@ def build_messages(state: MealPlanState) -> list[tuple[str, str]]:
         json.dumps(recipe_sample, indent=2),
         "",
         "Rules:",
+        "- HARD RULE: use ONLY ingredient names from the allowed pantry list above "
+        "(lowercase, exact match). Do NOT invent, rename, or substitute any ingredient "
+        "that is not shown there.",
         "- Exactly one meal per day_index, no gaps, no duplicates of day_index.",
         "- appliances_used must be a subset of the available appliances.",
-        "- Use only allowed-pantry ingredient names (lowercase, exact match).",
-        "- Give realistic quantities with units ('g', 'ml', 'pcs', 'tbsp').",
+        "- UNITS: 'pcs' or 'piece' may be used ONLY for these countable ingredients: "
+        f"{countable_pantry or 'none'}. Every other solid ingredient MUST use 'g' "
+        "(or 'kg'); every liquid, oil, or condiment MUST use 'ml', 'tbsp', 'tsp', "
+        "or 'cup'. (e.g. soy sauce -> 'ml' or 'tbsp', never 'pcs'.)",
+        "- Give realistic quantities; the nutrition DB is gram-based.",
         "- Leave nutrition null; it is computed downstream.",
         f"- servings = {servings} for every meal.",
     ]

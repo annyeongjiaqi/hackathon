@@ -3,7 +3,9 @@
 Plain Python, no LLM. Runs right after Creative(meals):
   1. every ingredient must exist in the ingredients DB
      (reuses nutrition_calculator.load_ingredients_db — not reimplemented)
-  2. fill each meal's nutrition via nutrition_calculator.fill_meal_nutrition
+  2. compute each meal's nutrition via nutrition_calculator.calculate_meal_nutrition;
+     any ``skipped_ingredients`` it reports (not in DB / unit not convertible)
+     makes that meal INVALID, with a precise, actionable correction in the feedback
   3. every meal's appliances_used must be a subset of the household's appliances
   4. one meal per expected day_index (no gaps / duplicates)
 
@@ -13,12 +15,32 @@ Returns a pass/fail + a feedback string. Retry gating mirrors budget_validator:
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 
 from agent.constants import MEAL_VALIDATION_MAX_RETRIES
 from agent.schemas import Meal
 from agent.state import MealPlanState
-from agent.tools.nutrition_calculator import fill_meal_nutrition, load_ingredients_db
+from agent.tools.nutrition_calculator import calculate_meal_nutrition, load_ingredients_db
+
+# nutrition_calculator emits skip reasons as "<name> (<detail>)".
+_SKIP_REASON_RE = re.compile(r"^(?P<name>.+?) \((?P<detail>.+)\)$")
+
+
+def _actionable_skip(reason: str) -> str:
+    """Turn a raw skip reason into a correction Creative(meals) can act on."""
+    match = _SKIP_REASON_RE.match(reason)
+    if not match:
+        return reason
+    name, detail = match.group("name"), match.group("detail")
+    if "not convertible" in detail:
+        return (
+            f"{name}: {detail} - use 'g'/'kg' for a solid, or 'ml'/'tbsp'/'tsp'/'cup' "
+            f"for a liquid or condiment"
+        )
+    if "not in ingredients DB" in detail:
+        return f"{name}: not in the ingredient database - choose a replacement from the pantry list"
+    return f"{name}: {detail}"
 
 
 @dataclass
@@ -66,7 +88,14 @@ def validate_meals(
                 f"(available: {sorted(available)})"
             )
 
-        filled.append(fill_meal_nutrition(meal, db).model_dump())
+        # Nutrition: any ingredient the calculator had to skip makes the meal
+        # invalid (its numbers would be silently understated otherwise).
+        nutrition_result = calculate_meal_nutrition(meal.ingredients, db)
+        for reason in nutrition_result.skipped_ingredients:
+            problems.append(f"{tag}: {_actionable_skip(reason)}")
+        filled.append(
+            meal.model_copy(update={"nutrition": nutrition_result.nutrition}).model_dump()
+        )
 
     # day coverage
     if expected_days is not None:
@@ -141,6 +170,25 @@ if __name__ == "__main__":  # smoke test (no Bedrock call)
     assert any("pantry DB" in p for p in r2.problems)
     assert any("does not have" in p for p in r2.problems)
     assert any("day coverage" in p for p in r2.problems)
+    # skipped-ingredient now surfaces as an actionable problem, not just a warning
+    assert any("not in the ingredient database" in p for p in r2.problems)
     assert r2.should_retry(0) is True
     assert r2.should_retry(MEAL_VALIDATION_MAX_RETRIES) is False
+
+    # unit misuse: soy sauce is a real pantry ingredient but 'pcs' can't convert
+    unit_bad = [
+        {"name": "Soy bowl", "day_index": 0, "servings": 1,
+         "ingredients": [{"name": "chicken breast", "quantity": 150, "unit": "g"},
+                         {"name": "soy sauce", "quantity": 2, "unit": "pcs"}],
+         "appliances_used": ["stovetop"], "estimated_prep_minutes": 15},
+        {"name": "Tofu bowl", "day_index": 1, "servings": 1,
+         "ingredients": [{"name": "firm tofu", "quantity": 150, "unit": "g"}],
+         "appliances_used": ["stovetop"], "estimated_prep_minutes": 15},
+    ]
+    r3 = validate_meals(unit_bad, ["stovetop"], expected_days=2)
+    print(r3.feedback)
+    assert not r3.valid
+    assert any("soy sauce" in p and "not convertible" in p and "tbsp" in p for p in r3.problems)
+    assert not any("day coverage" in p for p in r3.problems)  # days are fine; only the unit is wrong
+    assert r3.should_retry(0) is True
     print("decision_support_meals smoke test OK")

@@ -86,7 +86,11 @@ class MealPlan(BaseModel):
 
 class GroceryItem(BaseModel):
     name: str = Field(description="Ingredient name, lowercase, matching the ingredient DB where possible")
-    quantity: float = Field(gt=0, description="Total amount to buy, aggregated across all meals")
+    quantity: float = Field(
+        ge=0,
+        description="Amount the plan needs (aggregated across all meals); may be 0 only for an "
+        "already_have item",
+    )
     unit: str = Field(description="Unit for quantity, e.g. 'g', 'ml', 'pcs'")
     category: str = Field(
         default="other",
