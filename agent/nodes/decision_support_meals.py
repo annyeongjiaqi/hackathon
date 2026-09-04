@@ -8,6 +8,11 @@ Plain Python, no LLM. Runs right after Creative(meals):
      makes that meal INVALID, with a precise, actionable correction in the feedback
   3. every meal's appliances_used must be a subset of the household's appliances
   4. one meal per expected day_index (no gaps / duplicates)
+  5. no ingredient from this session's excluded_ingredients_for_session()
+     (learned from past preference_fixable rejections) - this is the backstop
+     for creative_meals.py's prompt-level "HARD EXCLUSION" instruction: the
+     model is TOLD not to use e.g. garlic, but nothing before this enforced it
+     code-side if it slipped through anyway
 
 Returns a pass/fail + a feedback string. Retry gating mirrors budget_validator:
 ``MealValidationResult.should_retry(retry_count)`` against MEAL_VALIDATION_MAX_RETRIES.
@@ -19,6 +24,7 @@ import re
 from dataclasses import dataclass, field
 
 from agent.constants import MEAL_VALIDATION_MAX_RETRIES
+from agent.nodes.personalized import excluded_ingredients_for_session
 from agent.schemas import Meal
 from agent.state import MealPlanState
 from agent.tools.nutrition_calculator import calculate_meal_nutrition, load_ingredients_db
@@ -60,9 +66,16 @@ def validate_meals(
     *,
     expected_days: int | None = None,
     ingredients_db: dict[str, dict] | None = None,
+    excluded_ingredients: dict[str, str] | None = None,
 ) -> MealValidationResult:
+    """``excluded_ingredients`` should be the SAME dict (ingredient -> reason)
+    ``creative_meals.py`` used to build the prompt - typically
+    ``excluded_ingredients_for_session(state["session_id"])`` - so this checks
+    the model actually complied with the exclusion it was told about, not some
+    independently-computed set."""
     db = ingredients_db if ingredients_db is not None else load_ingredients_db()
     available = {a.strip().lower() for a in (appliances or [])}
+    excluded = excluded_ingredients or {}
     problems: list[str] = []
     filled: list[dict] = []
     seen_days: list[int] = []
@@ -80,6 +93,15 @@ def validate_meals(
         )
         if missing:
             problems.append(f"{tag}: ingredients not in the pantry DB: {missing}")
+
+        banned = sorted({ing.name.strip().lower() for ing in meal.ingredients} & excluded.keys())
+        for ing_name in banned:
+            reason = excluded.get(ing_name, "")
+            reason_clause = f" ({reason})" if reason else ""
+            problems.append(
+                f"{tag}: uses '{ing_name}', which is banned for this session due to a prior "
+                f"rejection{reason_clause} - do not use it, use an alternative instead."
+            )
 
         extra = sorted({a for a in meal.appliances_used if a.strip().lower() not in available})
         if extra and available:
@@ -131,6 +153,7 @@ def decision_support_meals_node(state: MealPlanState) -> dict:
         state.get("meals") or [],
         state.get("appliances") or [],
         expected_days=int(expected_days) if expected_days else None,
+        excluded_ingredients=excluded_ingredients_for_session(state.get("session_id") or ""),
     )
     retry_count = int(state.get("meals_retry_count") or 0)
     status = "valid" if result.valid else f"invalid ({len(result.problems)} problem(s))"
@@ -158,6 +181,13 @@ if __name__ == "__main__":  # smoke test (no Bedrock call)
     print(r.feedback)
     assert r.valid and r.meals[0]["nutrition"]["calories"] > 0
     assert r.should_retry(0) is False
+
+    # no exclusion history -> identical result whether the arg is omitted,
+    # None, or an explicit empty dict (this is the "unchanged behavior" case)
+    r_empty = validate_meals(good, ["microwave", "stovetop"], expected_days=2, excluded_ingredients={})
+    r_none = validate_meals(good, ["microwave", "stovetop"], expected_days=2, excluded_ingredients=None)
+    assert r_empty.valid == r_none.valid == r.valid == True
+    assert r_empty.feedback == r_none.feedback == r.feedback
 
     bad = [
         {"name": "Air-fried mystery", "day_index": 0, "servings": 1,
@@ -191,4 +221,33 @@ if __name__ == "__main__":  # smoke test (no Bedrock call)
     assert any("soy sauce" in p and "not convertible" in p and "tbsp" in p for p in r3.problems)
     assert not any("day coverage" in p for p in r3.problems)  # days are fine; only the unit is wrong
     assert r3.should_retry(0) is True
+
+    # backstop: the model reintroduced a session-excluded ingredient (garlic).
+    # Deterministic, no Bedrock call - the live forced-failure test (see the
+    # task report) proves this against a REAL model slip; this proves the
+    # checker + feedback wording in isolation.
+    garlic_slip = [
+        {"name": "Garlic Chicken Bowl", "day_index": 0, "servings": 1,
+         "ingredients": [{"name": "chicken breast", "quantity": 150, "unit": "g"},
+                         {"name": "garlic", "quantity": 2, "unit": "pcs"}],
+         "appliances_used": ["stovetop"], "estimated_prep_minutes": 20},
+        {"name": "Tofu bowl", "day_index": 1, "servings": 1,
+         "ingredients": [{"name": "firm tofu", "quantity": 150, "unit": "g"}],
+         "appliances_used": ["stovetop"], "estimated_prep_minutes": 15},
+    ]
+    r4 = validate_meals(
+        garlic_slip, ["stovetop"], expected_days=2,
+        excluded_ingredients={"garlic": "The user finds the garlic quantity excessive for their taste."},
+    )
+    print(r4.feedback)
+    assert not r4.valid
+    assert any(
+        "garlic" in p and "banned for this session due to a prior rejection" in p
+        and "garlic quantity excessive" in p and "use an alternative instead" in p
+        for p in r4.problems
+    ), r4.problems
+    # the clean second meal must NOT be flagged just because garlic is banned somewhere in the plan
+    assert not any("Tofu bowl" in p for p in r4.problems)
+    assert r4.should_retry(0) is True
+
     print("decision_support_meals smoke test OK")

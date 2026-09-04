@@ -60,8 +60,16 @@ DEFAULT_TEMPERATURE = 0.7
 DEFAULT_MAX_TOKENS = 1024
 
 # Creative(meals): needs creativity + room for a whole multi-day plan.
+# BUG found in live testing (round 3 of the pre-demo test pass): 8192 was
+# enough for the plan lengths tested up through Day 3 (a 4-day demo run) but
+# not for a real 28-day plan (one of the 4 selectable shopping_frequency_days
+# values in the UI, [3, 7, 14, 28]) - the structured-output call got cut off
+# mid-JSON, MealPlan.meals came back missing entirely, and the request crashed
+# with a raw 500 (unhandled pydantic ValidationError). ~28 meals x ingredients
+# + steps needs meaningfully more than 8192 tokens of output. Bumped with
+# real headroom; confirmed Bedrock accepts this value for the model in use.
 MEAL_GENERATION_TEMPERATURE = 0.7
-MEAL_GENERATION_MAX_TOKENS = 8192
+MEAL_GENERATION_MAX_TOKENS = 24576
 
 # Creative(grocery): more deterministic (aggregating a known meal set), still
 # a long list with per-item costs.

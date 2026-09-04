@@ -23,6 +23,7 @@ from agent.constants import (
     MEAL_GENERATION_MAX_TOKENS,
     MEAL_GENERATION_TEMPERATURE,
 )
+from agent.nodes.personalized import excluded_ingredients_for_session, format_excluded_ingredients_note
 from agent.schemas import MealDraft, MealPlan
 from agent.state import MealPlanState
 from agent.tools.nutrition_calculator import _COUNT_ITEM_GRAMS, load_ingredients_db
@@ -140,6 +141,24 @@ def _servings_for_household(living_alone_or_partner: str) -> int:
     return 1 if "alone" in (living_alone_or_partner or "").lower() else 2
 
 
+def _pantry_with_exclusions(state: MealPlanState) -> tuple[list[str], list[str], str]:
+    """Allowed pantry / countable-pantry, with this session's hard-excluded
+    ingredients (from past preference_fixable rejections) removed, plus the
+    prompt line explaining why.
+
+    Used by both the full-plan and scoped single-meal prompt builders so
+    "start of meal generation" means the same thing in either path. Returns
+    ``("", ...)`` for the note when there's no session_id or no rejection
+    history yet - the resulting prompt is then byte-identical to one built
+    with no exclusion logic at all, so a fresh session needs no special-casing.
+    """
+    full_pantry = set(load_ingredients_db().keys())
+    excluded = excluded_ingredients_for_session(state.get("session_id") or "")
+    allowed_pantry = sorted(full_pantry - excluded.keys())
+    countable_pantry = sorted(set(_COUNT_ITEM_GRAMS) & set(allowed_pantry))
+    return allowed_pantry, countable_pantry, format_excluded_ingredients_note(excluded)
+
+
 def _shared_rule_lines(countable_pantry: list[str], servings: int) -> list[str]:
     """The ingredient / unit / appliance rules, identical for full-plan and
     single-meal (scoped regeneration) prompts."""
@@ -169,11 +188,7 @@ def build_messages(state: MealPlanState) -> list[tuple[str, str]]:
     household = state.get("living_alone_or_partner") or "partner"
     servings = _servings_for_household(household)
 
-    allowed_pantry = sorted(load_ingredients_db().keys())
-    # Single source of truth for which ingredients may carry a "pcs"/"piece" unit:
-    # the keys of nutrition_calculator._COUNT_ITEM_GRAMS, intersected with the
-    # pantry actually offered here.
-    countable_pantry = sorted(set(_COUNT_ITEM_GRAMS) & set(allowed_pantry))
+    allowed_pantry, countable_pantry, learned_note = _pantry_with_exclusions(state)
     recipe_sample = _sample_recipes(load_recipes_reference(), cuisine_preferences, dietary_restrictions)
     freshness = freshness_constraint_text(total_plan_days)
 
@@ -191,6 +206,15 @@ def build_messages(state: MealPlanState) -> list[tuple[str, str]]:
         "",
         "Allowed pantry - every ingredient you use MUST be one of these exact names:",
         f"  {allowed_pantry}",
+    ]
+    if learned_note:
+        lines += [
+            "",
+            f"Learned from past feedback (HARD EXCLUSION - these ingredients are already "
+            f"removed from the pantry list above; do not reintroduce one via a reference "
+            f"recipe below either): {learned_note}",
+        ]
+    lines += [
         "",
         "Reference recipes for inspiration (adapt freely, respect the constraints above):",
         json.dumps(recipe_sample, indent=2),
@@ -273,8 +297,7 @@ def build_single_meal_messages(
     household = state.get("living_alone_or_partner") or "partner"
     servings = _servings_for_household(household)
 
-    allowed_pantry = sorted(load_ingredients_db().keys())
-    countable_pantry = sorted(set(_COUNT_ITEM_GRAMS) & set(allowed_pantry))
+    allowed_pantry, countable_pantry, learned_note = _pantry_with_exclusions(state)
     freshness = freshness_constraint_text(total_plan_days)
 
     other_meals = [m.get("name", "?") for i, m in enumerate(meals) if i != meal_index]
@@ -292,6 +315,14 @@ def build_single_meal_messages(
         "",
         "Allowed pantry - every ingredient you use MUST be one of these exact names:",
         f"  {allowed_pantry}",
+    ]
+    if learned_note:
+        lines += [
+            "",
+            f"Learned from past feedback (HARD EXCLUSION - these ingredients are already "
+            f"removed from the pantry list above): {learned_note}",
+        ]
+    lines += [
         "",
         "The meal being replaced (do NOT reproduce it; resolve the objection below):",
         json.dumps(

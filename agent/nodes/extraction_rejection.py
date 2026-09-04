@@ -86,7 +86,11 @@ def extraction_rejection_node(state: MealPlanState) -> dict:
     assessment: RejectionAssessment = (
         _build_model().with_structured_output(RejectionAssessment).invoke(build_messages(state))
     )
-    target = (assessment.target_ingredient or "").strip().lower() or ""
+    target = (assessment.target_ingredient or "").strip().lower()
+    if target in ("null", "none", "n/a", "unknown"):
+        # Bedrock structured output occasionally emits the literal string "null"
+        # for an unset Optional field instead of omitting it / using JSON null.
+        target = ""
     return {
         "rejection_category": assessment.category,
         "rejection_reason_summary": assessment.reason_summary,

@@ -60,6 +60,7 @@ class MealPlanState(TypedDict, total=False):
     grocery_valid: bool
     grocery_feedback: str
     grocery_retry_count: int   # bounded by GROCERY_VALIDATION_MAX_RETRIES
+    grocery_best_attempt: dict  # cheapest {grocery_list, total_cost, feedback} seen across retries
     estimated_grocery_cost: float
     grocery_list_status: str   # "estimated" | "final"
 

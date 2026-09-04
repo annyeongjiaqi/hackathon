@@ -45,15 +45,30 @@ def freshness_tiers_for_plan(total_plan_days: int) -> list[FreshnessTier]:
 
 
 def freshness_constraint_text(total_plan_days: int) -> str:
-    """One-line constraint string to drop into the Creative(meals) prompt."""
-    if total_plan_days <= 7:
+    """One-line constraint string to drop into the Creative(meals) prompt.
+
+    BUG fixed here (found live-testing the 7-vs-8-day boundary): this used to
+    re-derive the shelf_stable range with its own arithmetic
+    (``FRESH_WINDOW_DAYS + 1`` to ``total_plan_days - 1``) instead of asking
+    ``freshness_tiers_for_plan()``. Because ``get_freshness_tier``'s own
+    boundary is inclusive (day_index <= 7 is "fresh"), the actual fresh window
+    is 8 days, not 7 - so a `total_plan_days == 8` plan has ZERO shelf_stable
+    days, but the old formula still built a range for one, producing the
+    nonsensical "Days 8-7: prefer frozen...". Deriving the text from the same
+    tier list ``get_freshness_tier`` produces (single source of truth) makes
+    this whole class of off-by-one impossible rather than just this instance
+    of it.
+    """
+    tiers = freshness_tiers_for_plan(total_plan_days)
+    if "shelf_stable" not in tiers:
         return (
-            f"All {total_plan_days} days: any ingredients are fine - the whole plan "
-            "is eaten within a week of shopping."
+            f"All {total_plan_days} days: any ingredients are fine - every day of this "
+            "plan is still within the fresh window from day 1's shopping trip."
         )
+    shelf_stable_start = tiers.index("shelf_stable")
     return (
-        f"Days 0-{FRESH_WINDOW_DAYS}: any ingredients. "
-        f"Days {FRESH_WINDOW_DAYS + 1}-{total_plan_days - 1}: prefer frozen, canned, "
+        f"Days 0-{shelf_stable_start - 1}: any ingredients. "
+        f"Days {shelf_stable_start}-{total_plan_days - 1}: prefer frozen, canned, "
         "dried, or naturally long-shelf-life ingredients (root veg, grains, legumes) "
         "since everything is purchased on day 1 and these won't spoil."
     )
@@ -68,7 +83,26 @@ if __name__ == "__main__":  # smoke test
     assert freshness_tiers_for_plan(3) == ["fresh", "fresh", "fresh"]
     tiers = freshness_tiers_for_plan(28)
     assert tiers.count("fresh") == 8 and tiers.count("shelf_stable") == 20
+
+    # regression: total_plan_days == 8 is the edge case that broke the text -
+    # every one of its 8 days (day_index 0..7) is "fresh" (inclusive boundary),
+    # so there must be no shelf_stable range described at all
+    assert freshness_tiers_for_plan(8) == ["fresh"] * 8
+    text_8 = freshness_constraint_text(8)
+    assert "shelf_stable" not in freshness_tiers_for_plan(8)
+    assert "Days 8-7" not in text_8, text_8  # the exact malformed range this used to produce
+    assert "prefer frozen" not in text_8, text_8
+    assert "All 8 days" in text_8, text_8
+
+    # the real boundary: a 9-day plan is the shortest one with a shelf_stable day
+    assert freshness_tiers_for_plan(9) == ["fresh"] * 8 + ["shelf_stable"]
+    text_9 = freshness_constraint_text(9)
+    assert "Days 0-7: any ingredients" in text_9, text_9
+    assert "Days 8-8: prefer frozen" in text_9, text_9
+
     print("short plan :", freshness_constraint_text(5))
+    print("8-day plan :", text_8)
+    print("9-day plan :", text_9)
     print("long plan  :", freshness_constraint_text(28))
     print("28-day tiers:", freshness_tiers_for_plan(28))
     print("shelf_life_rules smoke test OK")

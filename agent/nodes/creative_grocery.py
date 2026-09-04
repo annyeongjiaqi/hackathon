@@ -94,7 +94,10 @@ def build_messages(
         json.dumps(cost_hints, indent=2) if cost_hints else "  (none available)",
         "",
         "Rules:",
-        "- One line item per ingredient; keep names exactly as given.",
+        "- One line item per ingredient; keep names exactly as given - never rename, drop, or "
+        "substitute one for a different ingredient, even a cheaper one. This list must always "
+        "match what the meal plan's recipes actually call for; a swap here without changing the "
+        "recipe would make the shopping list wrong.",
         "- quantity = a realistic amount to actually buy (whole packs/units), >= the amount needed.",
         "- estimated_cost = your best price estimate for that quantity at this supermarket.",
         "- Fill estimated_total_cost and within_budget from your own numbers "
@@ -108,9 +111,12 @@ def build_messages(
     if feedback and retry_count > 0 and not feedback.lower().startswith("ok:"):
         lines += [
             "",
-            "IMPORTANT - the previous shopping list failed the budget check. Apply these "
-            "changes (swap costly items for the cheaper alternatives suggested) and keep "
-            "the rest the same:",
+            "IMPORTANT - the previous shopping list failed validation. Read the problems "
+            "below and fix them WITHOUT renaming, removing, or substituting any ingredient - "
+            "every line item's name must stay exactly one of the consolidated ingredients "
+            "above. If a problem mentions a cheaper alternative ingredient, that is context "
+            "only, not permission to swap it in; bring the cost down by buying a smaller "
+            "quantity / cheaper pack size of the SAME ingredient instead:",
             feedback,
         ]
 
