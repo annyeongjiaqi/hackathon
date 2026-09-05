@@ -3,8 +3,9 @@
 This is the first of the roadmap's 4 triggered flows. It reads the onboarding
 fields off ``MealPlanState``, builds a grounded prompt (allowed pantry +
 freshness constraints + a small recipe sample + any prior validation feedback),
-and forces the model's answer into the ``MealPlan`` Pydantic shape via
-``with_structured_output``.
+asks the model for plain JSON, then validates that JSON locally with the
+``MealPlan`` Pydantic model. This avoids Bedrock tool-output cases where the
+``meals`` array is incorrectly returned as a quoted string.
 
 No deterministic checks happen here — that's Decision-Support(meals). This node
 only produces candidate meals and bumps the retry counter.
@@ -70,6 +71,73 @@ SYSTEM_PROMPT = (
     "never invent, rename, or substitute an ingredient that is not on that list. "
     "You return exactly one meal per day for the requested number of days."
 )
+
+
+def _response_text(response) -> str:
+    """Extract text from a LangChain/Bedrock response."""
+    content = response.content
+
+    if isinstance(content, str):
+        return content
+
+    if isinstance(content, list):
+        parts: list[str] = []
+        for block in content:
+            if isinstance(block, dict):
+                text = block.get("text")
+                if isinstance(text, str):
+                    parts.append(text)
+            elif isinstance(block, str):
+                parts.append(block)
+        return "".join(parts)
+
+    return str(content)
+
+
+def _extract_json_object(text: str) -> dict:
+    """Parse one JSON object, tolerating markdown fences or surrounding prose."""
+    cleaned = text.strip()
+
+    if cleaned.startswith("```"):
+        first_newline = cleaned.find("\n")
+        if first_newline != -1:
+            cleaned = cleaned[first_newline + 1:]
+        if cleaned.rstrip().endswith("```"):
+            cleaned = cleaned.rstrip()[:-3]
+        cleaned = cleaned.strip()
+
+    # First try the whole response.
+    try:
+        data = json.loads(cleaned)
+    except json.JSONDecodeError:
+        # Fall back to the first complete JSON object if the model added prose.
+        start = cleaned.find("{")
+        if start == -1:
+            raise ValueError("Model response did not contain a JSON object.")
+
+        decoder = json.JSONDecoder()
+        try:
+            data, _ = decoder.raw_decode(cleaned[start:])
+        except json.JSONDecodeError as exc:
+            preview = cleaned[:500].replace("\n", "\\n")
+            raise ValueError(
+                f"Model returned invalid JSON: {exc}. Response preview: {preview}"
+            ) from exc
+
+    if not isinstance(data, dict):
+        raise ValueError("Model response must be a top-level JSON object.")
+
+    return data
+
+
+def _parse_meal_plan_response(response) -> MealPlan:
+    """Validate a plain-JSON initial-plan response."""
+    return MealPlan.model_validate(_extract_json_object(_response_text(response)))
+
+
+def _parse_meal_draft_response(response) -> MealDraft:
+    """Validate a plain-JSON single-meal response."""
+    return MealDraft.model_validate(_extract_json_object(_response_text(response)))
 
 
 def load_recipes_reference(path: Path = RECIPES_REFERENCE_PATH) -> list[dict]:
@@ -222,6 +290,17 @@ def build_messages(state: MealPlanState) -> list[tuple[str, str]]:
         "Rules:",
         "- Exactly one meal per day_index, no gaps, no duplicates of day_index.",
         *_shared_rule_lines(countable_pantry, servings),
+        "",
+        "OUTPUT FORMAT — STRICT:",
+        "- Return ONLY one valid JSON object. No markdown fences. No commentary.",
+        '- Top level must be exactly: {"meals": [...], "notes": ""}.',
+        "- meals MUST be a real JSON array, never a quoted/stringified array.",
+        "- Every meal object must contain: name, day_index, servings, ingredients, "
+        "steps, appliances_used, estimated_prep_minutes, nutrition, status.",
+        "- Every ingredients entry must be an object with exactly: name, quantity, unit.",
+        '- Set nutrition to null and status to "pending" for every generated meal.',
+        "- Use valid JSON syntax: double-quoted keys/strings, commas between fields, "
+        "and no trailing commas.",
     ]
 
     feedback = (state.get("meals_feedback") or "").strip()
@@ -249,9 +328,11 @@ def _build_model():
 def creative_meals_node(state: MealPlanState) -> dict:
     """LangGraph node: generate a candidate MealPlan, return a partial state update."""
     messages = build_messages(state)
-    model = _build_model().with_structured_output(MealPlan)
+    model = _build_model()
 
-    plan: MealPlan = model.invoke(messages)
+    response = model.invoke(messages)
+    plan = _parse_meal_plan_response(response)
+
     meals = [m.model_dump() for m in plan.meals]
     attempt = int(state.get("meals_retry_count") or 0) + 1
 
@@ -338,6 +419,14 @@ def build_single_meal_messages(
         "Rules:",
         f"- Return ONE meal with day_index = {day_index}.",
         *_shared_rule_lines(countable_pantry, servings),
+        "",
+        "OUTPUT FORMAT — STRICT:",
+        "- Return ONLY one valid JSON object. No markdown fences. No commentary.",
+        "- The object must contain exactly: name, day_index, servings, ingredients, "
+        "steps, appliances_used, estimated_prep_minutes.",
+        "- ingredients must be a real JSON array of objects with: name, quantity, unit.",
+        "- Use valid JSON syntax: double-quoted keys/strings, commas between fields, "
+        "and no trailing commas.",
     ]
     return [("system", SINGLE_MEAL_SYSTEM_PROMPT), ("human", "\n".join(lines))]
 
@@ -349,7 +438,8 @@ def regenerate_single_meal(state: MealPlanState, meal_index: int, guidance: str)
     recalculates it deterministically, no LLM. Does not mutate state.
     """
     messages = build_single_meal_messages(state, meal_index, guidance)
-    draft: MealDraft = _build_model().with_structured_output(MealDraft).invoke(messages)
+    response = _build_model().invoke(messages)
+    draft = _parse_meal_draft_response(response)
 
     data = draft.to_meal_dict()
     # pin the slot regardless of what the model returned

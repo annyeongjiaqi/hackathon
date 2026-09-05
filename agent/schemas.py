@@ -22,9 +22,13 @@ from pydantic import BaseModel, Field
 class IngredientLine(BaseModel):
     """One ingredient with the amount this recipe uses."""
 
-    name: str = Field(description="Ingredient name, lowercase, matching the ingredient DB where possible")
+    name: str = Field(
+        description="Ingredient name, lowercase, matching the ingredient DB where possible"
+    )
     quantity: float = Field(gt=0, description="Amount used in this meal")
-    unit: str = Field(description="Unit for quantity, e.g. 'g', 'ml', 'pcs', 'tbsp'")
+    unit: str = Field(
+        description="Unit for quantity, e.g. 'g', 'ml', 'pcs', 'tbsp'"
+    )
 
 
 class Nutrition(BaseModel):
@@ -49,15 +53,28 @@ class Nutrition(BaseModel):
 
 class Meal(BaseModel):
     name: str = Field(description="Dish name")
-    day_index: int = Field(ge=0, description="0-based day this meal is planned for")
-    servings: int = Field(default=2, ge=1, description="DINK couple: defaults to 2")
+    day_index: int = Field(
+        ge=0,
+        description="0-based day this meal is planned for",
+    )
+    servings: int = Field(
+        default=2,
+        ge=1,
+        description="DINK couple: defaults to 2",
+    )
     ingredients: list[IngredientLine] = Field(min_length=1)
-    steps: list[str] = Field(default_factory=list, description="Short ordered cooking steps")
+    steps: list[str] = Field(
+        default_factory=list,
+        description="Short ordered cooking steps",
+    )
     appliances_used: list[str] = Field(
         default_factory=list,
         description="Appliances this recipe needs; must be a subset of the user's appliances",
     )
-    estimated_prep_minutes: int = Field(ge=0, description="Rough total hands-on + cook time")
+    estimated_prep_minutes: int = Field(
+        ge=0,
+        description="Rough total hands-on + cook time",
+    )
     nutrition: Nutrition | None = Field(
         default=None,
         description="Leave null; populated downstream by the nutrition calculator",
@@ -75,30 +92,42 @@ class MealDraft(BaseModel):
     """
 
     name: str = Field(description="Dish name")
-    day_index: int = Field(ge=0, description="0-based day this meal is planned for")
+    day_index: int = Field(
+        ge=0,
+        description="0-based day this meal is planned for",
+    )
     servings: int = Field(default=2, ge=1)
     ingredients: list[IngredientLine] = Field(min_length=1)
-    steps: list[str] = Field(default_factory=list, description="Short ordered cooking steps")
+    steps: list[str] = Field(
+        default_factory=list,
+        description="Short ordered cooking steps",
+    )
     appliances_used: list[str] = Field(
         default_factory=list,
         description="Appliances this recipe needs; must be a subset of the user's appliances",
     )
-    estimated_prep_minutes: int = Field(ge=0, description="Rough total hands-on + cook time")
+    estimated_prep_minutes: int = Field(
+        ge=0,
+        description="Rough total hands-on + cook time",
+    )
 
     def to_meal_dict(self) -> dict:
         """As a ``Meal``-shaped dict with the computed fields left for downstream."""
-        return {**self.model_dump(), "nutrition": None, "status": "pending"}
+        return {
+            **self.model_dump(),
+            "nutrition": None,
+            "status": "pending",
+        }
 
 
 class MealPlan(BaseModel):
-    """Full structured output of Creative(meals).
-
-    Used for the initial full plan and for scoped regenerations (in the scoped
-    case the node keeps only the meals it asked for).
-    """
+    """Full structured output of Creative(meals)."""
 
     meals: list[Meal] = Field(min_length=1)
-    notes: str = Field(default="", description="Optional one-line rationale for the plan")
+    notes: str = Field(
+        default="",
+        description="Optional one-line rationale for the plan",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -107,18 +136,27 @@ class MealPlan(BaseModel):
 
 
 class GroceryItem(BaseModel):
-    name: str = Field(description="Ingredient name, lowercase, matching the ingredient DB where possible")
+    name: str = Field(
+        description="Ingredient name, lowercase, matching the ingredient DB where possible"
+    )
     quantity: float = Field(
         ge=0,
-        description="Amount the plan needs (aggregated across all meals); may be 0 only for an "
-        "already_have item",
+        description=(
+            "Amount the plan needs (aggregated across all meals); may be 0 only for an "
+            "already_have item"
+        ),
     )
-    unit: str = Field(description="Unit for quantity, e.g. 'g', 'ml', 'pcs'")
+    unit: str = Field(
+        description="Unit for quantity, e.g. 'g', 'ml', 'pcs'"
+    )
     category: str = Field(
         default="other",
         description="Supermarket section, e.g. 'produce', 'meat', 'dairy', 'pantry'",
     )
-    estimated_cost: float = Field(ge=0, description="Estimated price for this line item, in local currency")
+    estimated_cost: float = Field(
+        ge=0,
+        description="Estimated price for this line item, in local currency",
+    )
     already_have: bool = Field(
         default=False,
         description="True if covered by tracked leftover_ingredients and should not be bought",
@@ -135,8 +173,13 @@ class GroceryList(BaseModel):
 
     items: list[GroceryItem] = Field(min_length=1)
     estimated_total_cost: float = Field(ge=0)
-    within_budget: bool = Field(description="Model's own check of total vs. the user's budget")
-    shopping_day_index: int = Field(ge=0, description="Day index this shop covers")
+    within_budget: bool = Field(
+        description="Model's own check of total vs. the user's budget"
+    )
+    shopping_day_index: int = Field(
+        ge=0,
+        description="Day index this shop covers",
+    )
 
 
 # ---------------------------------------------------------------------------
