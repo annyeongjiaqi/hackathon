@@ -479,5 +479,490 @@
     "estimated_prep_minutes": 12,
     "difficulty": "easy",
     "cost_estimate_sgd": 3.88
+  },
+  {
+    "name": "Oven Char Siu-Style Chicken with Rice",
+    "cuisine": "chinese",
+    "nutrition_profile": "high-protein_balanced",
+    "ingredients": [
+      {
+        "name": "chicken breast",
+        "quantity": 400,
+        "unit": "g"
+      },
+      {
+        "name": "dark soy sauce",
+        "quantity": 30,
+        "unit": "ml"
+      },
+      {
+        "name": "oyster sauce",
+        "quantity": 30,
+        "unit": "ml"
+      },
+      {
+        "name": "five-spice powder",
+        "quantity": 3,
+        "unit": "g"
+      },
+      {
+        "name": "garlic",
+        "quantity": 10,
+        "unit": "g"
+      },
+      {
+        "name": "sesame oil",
+        "quantity": 10,
+        "unit": "ml"
+      },
+      {
+        "name": "brown rice",
+        "quantity": 150,
+        "unit": "g"
+      },
+      {
+        "name": "spring onion",
+        "quantity": 15,
+        "unit": "g"
+      }
+    ],
+    "appliances_used": [
+      "oven"
+    ],
+    "estimated_prep_minutes": 40,
+    "difficulty": "easy",
+    "cost_estimate_sgd": 10.8
+  },
+  {
+    "name": "Creamy Mushroom Parmesan Pasta",
+    "cuisine": "italian",
+    "nutrition_profile": "balanced_comfort",
+    "ingredients": [
+      {
+        "name": "dried pasta",
+        "quantity": 200,
+        "unit": "g"
+      },
+      {
+        "name": "button mushrooms",
+        "quantity": 200,
+        "unit": "g"
+      },
+      {
+        "name": "heavy cream",
+        "quantity": 100,
+        "unit": "ml"
+      },
+      {
+        "name": "parmesan cheese",
+        "quantity": 40,
+        "unit": "g"
+      },
+      {
+        "name": "garlic",
+        "quantity": 10,
+        "unit": "g"
+      },
+      {
+        "name": "butter",
+        "quantity": 20,
+        "unit": "g"
+      },
+      {
+        "name": "fresh parsley",
+        "quantity": 5,
+        "unit": "g"
+      },
+      {
+        "name": "olive oil",
+        "quantity": 10,
+        "unit": "ml"
+      }
+    ],
+    "appliances_used": [
+      "stovetop"
+    ],
+    "estimated_prep_minutes": 25,
+    "difficulty": "easy",
+    "cost_estimate_sgd": 8.1
+  },
+  {
+    "name": "Pan-Seared Teriyaki Salmon with Rice",
+    "cuisine": "japanese",
+    "nutrition_profile": "high-protein_balanced",
+    "ingredients": [
+      {
+        "name": "salmon fillet",
+        "quantity": 300,
+        "unit": "g"
+      },
+      {
+        "name": "dark soy sauce",
+        "quantity": 30,
+        "unit": "ml"
+      },
+      {
+        "name": "brown rice",
+        "quantity": 150,
+        "unit": "g"
+      },
+      {
+        "name": "ginger",
+        "quantity": 8,
+        "unit": "g"
+      },
+      {
+        "name": "sesame oil",
+        "quantity": 5,
+        "unit": "ml"
+      },
+      {
+        "name": "spring onion",
+        "quantity": 15,
+        "unit": "g"
+      },
+      {
+        "name": "broccoli",
+        "quantity": 150,
+        "unit": "g"
+      }
+    ],
+    "appliances_used": [
+      "stovetop"
+    ],
+    "estimated_prep_minutes": 22,
+    "difficulty": "easy",
+    "cost_estimate_sgd": 14.2
+  },
+  {
+    "name": "Pan-Seared Sirloin Steak with Creamy Mushroom Sauce",
+    "cuisine": "western",
+    "nutrition_profile": "high-protein_low-carb",
+    "ingredients": [
+      {
+        "name": "sirloin steak",
+        "quantity": 250,
+        "unit": "g"
+      },
+      {
+        "name": "button mushrooms",
+        "quantity": 150,
+        "unit": "g"
+      },
+      {
+        "name": "butter",
+        "quantity": 25,
+        "unit": "g"
+      },
+      {
+        "name": "white wine",
+        "quantity": 50,
+        "unit": "ml"
+      },
+      {
+        "name": "heavy cream",
+        "quantity": 50,
+        "unit": "ml"
+      },
+      {
+        "name": "garlic",
+        "quantity": 8,
+        "unit": "g"
+      },
+      {
+        "name": "fresh parsley",
+        "quantity": 5,
+        "unit": "g"
+      },
+      {
+        "name": "sweet potato",
+        "quantity": 200,
+        "unit": "g"
+      }
+    ],
+    "appliances_used": [
+      "stovetop",
+      "oven"
+    ],
+    "estimated_prep_minutes": 30,
+    "difficulty": "easy",
+    "cost_estimate_sgd": 16.4
+  },
+  {
+    "name": "Gochujang Chicken Stir-Fry with Rice",
+    "cuisine": "korean",
+    "nutrition_profile": "high-protein_balanced",
+    "ingredients": [
+      {
+        "name": "chicken breast",
+        "quantity": 350,
+        "unit": "g"
+      },
+      {
+        "name": "gochujang",
+        "quantity": 40,
+        "unit": "g"
+      },
+      {
+        "name": "dark soy sauce",
+        "quantity": 15,
+        "unit": "ml"
+      },
+      {
+        "name": "garlic",
+        "quantity": 10,
+        "unit": "g"
+      },
+      {
+        "name": "ginger",
+        "quantity": 8,
+        "unit": "g"
+      },
+      {
+        "name": "spring onion",
+        "quantity": 15,
+        "unit": "g"
+      },
+      {
+        "name": "sesame oil",
+        "quantity": 10,
+        "unit": "ml"
+      },
+      {
+        "name": "onion",
+        "quantity": 100,
+        "unit": "g"
+      },
+      {
+        "name": "brown rice",
+        "quantity": 150,
+        "unit": "g"
+      }
+    ],
+    "appliances_used": [
+      "stovetop"
+    ],
+    "estimated_prep_minutes": 20,
+    "difficulty": "easy",
+    "cost_estimate_sgd": 9.4
+  },
+  {
+    "name": "Ayam Masak Merah-Style Chicken with Rice",
+    "cuisine": "malay",
+    "nutrition_profile": "high-protein_balanced",
+    "ingredients": [
+      {
+        "name": "chicken breast",
+        "quantity": 400,
+        "unit": "g"
+      },
+      {
+        "name": "tomato paste",
+        "quantity": 40,
+        "unit": "g"
+      },
+      {
+        "name": "coconut milk",
+        "quantity": 150,
+        "unit": "ml"
+      },
+      {
+        "name": "chili powder",
+        "quantity": 5,
+        "unit": "g"
+      },
+      {
+        "name": "turmeric powder",
+        "quantity": 3,
+        "unit": "g"
+      },
+      {
+        "name": "ground coriander",
+        "quantity": 4,
+        "unit": "g"
+      },
+      {
+        "name": "garlic",
+        "quantity": 10,
+        "unit": "g"
+      },
+      {
+        "name": "ginger",
+        "quantity": 8,
+        "unit": "g"
+      },
+      {
+        "name": "shallot",
+        "quantity": 40,
+        "unit": "g"
+      },
+      {
+        "name": "lemongrass",
+        "quantity": 20,
+        "unit": "g"
+      },
+      {
+        "name": "olive oil",
+        "quantity": 15,
+        "unit": "ml"
+      },
+      {
+        "name": "brown rice",
+        "quantity": 150,
+        "unit": "g"
+      }
+    ],
+    "appliances_used": [
+      "stovetop"
+    ],
+    "estimated_prep_minutes": 30,
+    "difficulty": "easy",
+    "cost_estimate_sgd": 11.3
+  },
+  {
+    "name": "Simple Chicken Curry with Rice",
+    "cuisine": "indian",
+    "nutrition_profile": "high-protein_balanced",
+    "ingredients": [
+      {
+        "name": "chicken breast",
+        "quantity": 400,
+        "unit": "g"
+      },
+      {
+        "name": "curry powder",
+        "quantity": 15,
+        "unit": "g"
+      },
+      {
+        "name": "turmeric powder",
+        "quantity": 3,
+        "unit": "g"
+      },
+      {
+        "name": "ground cumin",
+        "quantity": 4,
+        "unit": "g"
+      },
+      {
+        "name": "ground coriander",
+        "quantity": 4,
+        "unit": "g"
+      },
+      {
+        "name": "cinnamon",
+        "quantity": 1,
+        "unit": "g"
+      },
+      {
+        "name": "coconut milk",
+        "quantity": 150,
+        "unit": "ml"
+      },
+      {
+        "name": "tomato paste",
+        "quantity": 30,
+        "unit": "g"
+      },
+      {
+        "name": "onion",
+        "quantity": 120,
+        "unit": "g"
+      },
+      {
+        "name": "garlic",
+        "quantity": 12,
+        "unit": "g"
+      },
+      {
+        "name": "ginger",
+        "quantity": 10,
+        "unit": "g"
+      },
+      {
+        "name": "olive oil",
+        "quantity": 15,
+        "unit": "ml"
+      },
+      {
+        "name": "brown rice",
+        "quantity": 150,
+        "unit": "g"
+      }
+    ],
+    "appliances_used": [
+      "stovetop"
+    ],
+    "estimated_prep_minutes": 30,
+    "difficulty": "easy",
+    "cost_estimate_sgd": 11.1
+  },
+  {
+    "name": "Thai-Style Prawn Coconut Curry with Rice",
+    "cuisine": "thai",
+    "nutrition_profile": "high-protein_balanced",
+    "ingredients": [
+      {
+        "name": "prawns",
+        "quantity": 300,
+        "unit": "g"
+      },
+      {
+        "name": "coconut milk",
+        "quantity": 200,
+        "unit": "ml"
+      },
+      {
+        "name": "chili powder",
+        "quantity": 4,
+        "unit": "g"
+      },
+      {
+        "name": "curry powder",
+        "quantity": 6,
+        "unit": "g"
+      },
+      {
+        "name": "fish sauce",
+        "quantity": 15,
+        "unit": "ml"
+      },
+      {
+        "name": "garlic",
+        "quantity": 10,
+        "unit": "g"
+      },
+      {
+        "name": "ginger",
+        "quantity": 8,
+        "unit": "g"
+      },
+      {
+        "name": "lemongrass",
+        "quantity": 20,
+        "unit": "g"
+      },
+      {
+        "name": "tamarind paste",
+        "quantity": 10,
+        "unit": "g"
+      },
+      {
+        "name": "spring onion",
+        "quantity": 15,
+        "unit": "g"
+      },
+      {
+        "name": "brown rice",
+        "quantity": 150,
+        "unit": "g"
+      }
+    ],
+    "appliances_used": [
+      "stovetop"
+    ],
+    "estimated_prep_minutes": 25,
+    "difficulty": "easy",
+    "cost_estimate_sgd": 12.8
   }
 ]

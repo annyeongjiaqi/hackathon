@@ -267,5 +267,627 @@
     },
     "shelf_life_days": 7,
     "substitutes": []
+  },
+  "curry powder": {
+    "category": "spice",
+    "cost_per_100g": 2.5,
+    "nutrition_per_100g": {
+      "calories": 325,
+      "protein_g": 14.0,
+      "carbs_g": 56.0,
+      "fat_g": 13.0,
+      "fiber_g": 33.0,
+      "sodium_mg": 52
+    },
+    "shelf_life_days": 540,
+    "substitutes": [
+      "turmeric powder",
+      "chili powder"
+    ]
+  },
+  "turmeric powder": {
+    "category": "spice",
+    "cost_per_100g": 2.0,
+    "nutrition_per_100g": {
+      "calories": 312,
+      "protein_g": 9.7,
+      "carbs_g": 67.1,
+      "fat_g": 3.2,
+      "fiber_g": 22.7,
+      "sodium_mg": 27
+    },
+    "shelf_life_days": 730,
+    "substitutes": [
+      "curry powder"
+    ]
+  },
+  "ground cumin": {
+    "category": "spice",
+    "cost_per_100g": 3.0,
+    "nutrition_per_100g": {
+      "calories": 375,
+      "protein_g": 17.8,
+      "carbs_g": 44.2,
+      "fat_g": 22.3,
+      "fiber_g": 10.5,
+      "sodium_mg": 168
+    },
+    "shelf_life_days": 730,
+    "substitutes": [
+      "ground coriander"
+    ]
+  },
+  "ground coriander": {
+    "category": "spice",
+    "cost_per_100g": 2.8,
+    "nutrition_per_100g": {
+      "calories": 298,
+      "protein_g": 12.4,
+      "carbs_g": 55.0,
+      "fat_g": 17.8,
+      "fiber_g": 41.9,
+      "sodium_mg": 35
+    },
+    "shelf_life_days": 730,
+    "substitutes": [
+      "ground cumin"
+    ]
+  },
+  "chili powder": {
+    "category": "spice",
+    "cost_per_100g": 2.2,
+    "nutrition_per_100g": {
+      "calories": 282,
+      "protein_g": 12.0,
+      "carbs_g": 49.7,
+      "fat_g": 14.3,
+      "fiber_g": 34.8,
+      "sodium_mg": 30
+    },
+    "shelf_life_days": 730,
+    "substitutes": [
+      "curry powder"
+    ]
+  },
+  "five-spice powder": {
+    "category": "spice",
+    "cost_per_100g": 3.2,
+    "nutrition_per_100g": {
+      "calories": 340,
+      "protein_g": 9.0,
+      "carbs_g": 60.0,
+      "fat_g": 10.0,
+      "fiber_g": 25.0,
+      "sodium_mg": 40
+    },
+    "shelf_life_days": 730,
+    "substitutes": [
+      "ground cumin"
+    ]
+  },
+  "cardamom": {
+    "category": "spice",
+    "cost_per_100g": 12.0,
+    "nutrition_per_100g": {
+      "calories": 311,
+      "protein_g": 10.8,
+      "carbs_g": 68.5,
+      "fat_g": 6.7,
+      "fiber_g": 28.0,
+      "sodium_mg": 18
+    },
+    "shelf_life_days": 730,
+    "substitutes": [
+      "cinnamon"
+    ]
+  },
+  "cinnamon": {
+    "category": "spice",
+    "cost_per_100g": 2.5,
+    "nutrition_per_100g": {
+      "calories": 247,
+      "protein_g": 4.0,
+      "carbs_g": 80.6,
+      "fat_g": 1.2,
+      "fiber_g": 53.1,
+      "sodium_mg": 10
+    },
+    "shelf_life_days": 730,
+    "substitutes": [
+      "cardamom"
+    ]
+  },
+  "dried oregano": {
+    "category": "herb",
+    "cost_per_100g": 18.0,
+    "nutrition_per_100g": {
+      "calories": 265,
+      "protein_g": 9.0,
+      "carbs_g": 68.9,
+      "fat_g": 4.3,
+      "fiber_g": 42.8,
+      "sodium_mg": 25
+    },
+    "shelf_life_days": 540,
+    "substitutes": [
+      "dried basil"
+    ]
+  },
+  "dried basil": {
+    "category": "herb",
+    "cost_per_100g": 16.0,
+    "nutrition_per_100g": {
+      "calories": 233,
+      "protein_g": 23.0,
+      "carbs_g": 47.8,
+      "fat_g": 4.1,
+      "fiber_g": 37.7,
+      "sodium_mg": 76
+    },
+    "shelf_life_days": 540,
+    "substitutes": [
+      "dried oregano"
+    ]
+  },
+  "dark soy sauce": {
+    "category": "condiment",
+    "cost_per_100g": 0.55,
+    "nutrition_per_100g": {
+      "calories": 60,
+      "protein_g": 6.0,
+      "carbs_g": 9.0,
+      "fat_g": 0.1,
+      "fiber_g": 0.5,
+      "sodium_mg": 6000
+    },
+    "shelf_life_days": 365,
+    "substitutes": [
+      "soy sauce"
+    ]
+  },
+  "oyster sauce": {
+    "category": "condiment",
+    "cost_per_100g": 0.7,
+    "nutrition_per_100g": {
+      "calories": 51,
+      "protein_g": 1.4,
+      "carbs_g": 11.0,
+      "fat_g": 0.3,
+      "fiber_g": 0.3,
+      "sodium_mg": 2733
+    },
+    "shelf_life_days": 365,
+    "substitutes": [
+      "soy sauce"
+    ]
+  },
+  "sesame oil": {
+    "category": "cooking_fat",
+    "cost_per_100g": 1.6,
+    "nutrition_per_100g": {
+      "calories": 884,
+      "protein_g": 0.0,
+      "carbs_g": 0.0,
+      "fat_g": 100.0,
+      "fiber_g": 0.0,
+      "sodium_mg": 0
+    },
+    "shelf_life_days": 365,
+    "substitutes": [
+      "olive oil"
+    ]
+  },
+  "fish sauce": {
+    "category": "condiment",
+    "cost_per_100g": 0.6,
+    "nutrition_per_100g": {
+      "calories": 35,
+      "protein_g": 5.1,
+      "carbs_g": 3.6,
+      "fat_g": 0.0,
+      "fiber_g": 0.0,
+      "sodium_mg": 7870
+    },
+    "shelf_life_days": 730,
+    "substitutes": [
+      "soy sauce"
+    ]
+  },
+  "gochujang": {
+    "category": "condiment",
+    "cost_per_100g": 1.4,
+    "nutrition_per_100g": {
+      "calories": 214,
+      "protein_g": 5.0,
+      "carbs_g": 41.0,
+      "fat_g": 2.6,
+      "fiber_g": 3.8,
+      "sodium_mg": 2400
+    },
+    "shelf_life_days": 365,
+    "substitutes": [
+      "chili powder"
+    ]
+  },
+  "tamarind paste": {
+    "category": "condiment",
+    "cost_per_100g": 1.2,
+    "nutrition_per_100g": {
+      "calories": 239,
+      "protein_g": 2.8,
+      "carbs_g": 62.5,
+      "fat_g": 0.6,
+      "fiber_g": 5.1,
+      "sodium_mg": 28
+    },
+    "shelf_life_days": 365,
+    "substitutes": []
+  },
+  "coconut milk": {
+    "category": "pantry",
+    "cost_per_100g": 0.35,
+    "nutrition_per_100g": {
+      "calories": 197,
+      "protein_g": 2.0,
+      "carbs_g": 3.3,
+      "fat_g": 21.3,
+      "fiber_g": 0.0,
+      "sodium_mg": 15
+    },
+    "shelf_life_days": 365,
+    "substitutes": [
+      "heavy cream"
+    ]
+  },
+  "tomato paste": {
+    "category": "pantry",
+    "cost_per_100g": 0.5,
+    "nutrition_per_100g": {
+      "calories": 82,
+      "protein_g": 4.3,
+      "carbs_g": 18.9,
+      "fat_g": 0.5,
+      "fiber_g": 4.1,
+      "sodium_mg": 59
+    },
+    "shelf_life_days": 365,
+    "substitutes": [
+      "tomato"
+    ]
+  },
+  "truffle oil": {
+    "category": "cooking_fat",
+    "cost_per_100g": 10.0,
+    "nutrition_per_100g": {
+      "calories": 884,
+      "protein_g": 0.0,
+      "carbs_g": 0.0,
+      "fat_g": 100.0,
+      "fiber_g": 0.0,
+      "sodium_mg": 0
+    },
+    "shelf_life_days": 365,
+    "substitutes": [
+      "olive oil"
+    ]
+  },
+  "balsamic glaze": {
+    "category": "condiment",
+    "cost_per_100g": 3.2,
+    "nutrition_per_100g": {
+      "calories": 230,
+      "protein_g": 1.0,
+      "carbs_g": 55.0,
+      "fat_g": 0.0,
+      "fiber_g": 0.0,
+      "sodium_mg": 40
+    },
+    "shelf_life_days": 365,
+    "substitutes": []
+  },
+  "ginger": {
+    "category": "aromatic",
+    "cost_per_100g": 0.6,
+    "nutrition_per_100g": {
+      "calories": 80,
+      "protein_g": 1.8,
+      "carbs_g": 17.8,
+      "fat_g": 0.8,
+      "fiber_g": 2.0,
+      "sodium_mg": 13
+    },
+    "shelf_life_days": 21,
+    "substitutes": [
+      "garlic"
+    ]
+  },
+  "lemongrass": {
+    "category": "aromatic",
+    "cost_per_100g": 1.5,
+    "nutrition_per_100g": {
+      "calories": 99,
+      "protein_g": 1.8,
+      "carbs_g": 25.3,
+      "fat_g": 0.5,
+      "fiber_g": 0.0,
+      "sodium_mg": 6
+    },
+    "shelf_life_days": 14,
+    "substitutes": [
+      "ginger"
+    ]
+  },
+  "spring onion": {
+    "category": "aromatic",
+    "cost_per_100g": 0.8,
+    "nutrition_per_100g": {
+      "calories": 32,
+      "protein_g": 1.8,
+      "carbs_g": 7.3,
+      "fat_g": 0.2,
+      "fiber_g": 2.6,
+      "sodium_mg": 16
+    },
+    "shelf_life_days": 7,
+    "substitutes": [
+      "onion"
+    ]
+  },
+  "button mushrooms": {
+    "category": "vegetable",
+    "cost_per_100g": 0.9,
+    "nutrition_per_100g": {
+      "calories": 22,
+      "protein_g": 3.1,
+      "carbs_g": 3.3,
+      "fat_g": 0.3,
+      "fiber_g": 1.0,
+      "sodium_mg": 5
+    },
+    "shelf_life_days": 7,
+    "substitutes": [
+      "firm tofu"
+    ]
+  },
+  "fresh parsley": {
+    "category": "herb",
+    "cost_per_100g": 2.5,
+    "nutrition_per_100g": {
+      "calories": 36,
+      "protein_g": 3.0,
+      "carbs_g": 6.3,
+      "fat_g": 0.8,
+      "fiber_g": 3.3,
+      "sodium_mg": 56
+    },
+    "shelf_life_days": 7,
+    "substitutes": [
+      "spring onion"
+    ]
+  },
+  "shallot": {
+    "category": "aromatic",
+    "cost_per_100g": 0.9,
+    "nutrition_per_100g": {
+      "calories": 72,
+      "protein_g": 2.5,
+      "carbs_g": 16.8,
+      "fat_g": 0.1,
+      "fiber_g": 3.2,
+      "sodium_mg": 12
+    },
+    "shelf_life_days": 30,
+    "substitutes": [
+      "onion"
+    ]
+  },
+  "all-purpose flour": {
+    "category": "baking",
+    "cost_per_100g": 0.2,
+    "nutrition_per_100g": {
+      "calories": 364,
+      "protein_g": 10.3,
+      "carbs_g": 76.3,
+      "fat_g": 1.0,
+      "fiber_g": 2.7,
+      "sodium_mg": 2
+    },
+    "shelf_life_days": 365,
+    "substitutes": [
+      "cornstarch"
+    ]
+  },
+  "cornstarch": {
+    "category": "baking",
+    "cost_per_100g": 0.3,
+    "nutrition_per_100g": {
+      "calories": 381,
+      "protein_g": 0.3,
+      "carbs_g": 91.3,
+      "fat_g": 0.1,
+      "fiber_g": 0.9,
+      "sodium_mg": 9
+    },
+    "shelf_life_days": 730,
+    "substitutes": [
+      "all-purpose flour"
+    ]
+  },
+  "breadcrumbs": {
+    "category": "baking",
+    "cost_per_100g": 0.6,
+    "nutrition_per_100g": {
+      "calories": 395,
+      "protein_g": 13.4,
+      "carbs_g": 71.9,
+      "fat_g": 5.3,
+      "fiber_g": 4.5,
+      "sodium_mg": 732
+    },
+    "shelf_life_days": 180,
+    "substitutes": [
+      "all-purpose flour"
+    ]
+  },
+  "butter": {
+    "category": "cooking_fat",
+    "cost_per_100g": 1.3,
+    "nutrition_per_100g": {
+      "calories": 717,
+      "protein_g": 0.9,
+      "carbs_g": 0.1,
+      "fat_g": 81.1,
+      "fiber_g": 0.0,
+      "sodium_mg": 11
+    },
+    "shelf_life_days": 60,
+    "substitutes": [
+      "olive oil"
+    ]
+  },
+  "parmesan cheese": {
+    "category": "dairy",
+    "cost_per_100g": 4.5,
+    "nutrition_per_100g": {
+      "calories": 431,
+      "protein_g": 38.5,
+      "carbs_g": 4.1,
+      "fat_g": 29.0,
+      "fiber_g": 0.0,
+      "sodium_mg": 1529
+    },
+    "shelf_life_days": 180,
+    "substitutes": [
+      "plain greek yogurt"
+    ]
+  },
+  "brie": {
+    "category": "dairy",
+    "cost_per_100g": 5.0,
+    "nutrition_per_100g": {
+      "calories": 334,
+      "protein_g": 20.8,
+      "carbs_g": 0.5,
+      "fat_g": 27.7,
+      "fiber_g": 0.0,
+      "sodium_mg": 629
+    },
+    "shelf_life_days": 21,
+    "substitutes": [
+      "parmesan cheese"
+    ]
+  },
+  "dried pasta": {
+    "category": "grains",
+    "cost_per_100g": 0.3,
+    "nutrition_per_100g": {
+      "calories": 371,
+      "protein_g": 13.0,
+      "carbs_g": 74.7,
+      "fat_g": 1.5,
+      "fiber_g": 3.2,
+      "sodium_mg": 6
+    },
+    "shelf_life_days": 365,
+    "substitutes": [
+      "brown rice"
+    ]
+  },
+  "heavy cream": {
+    "category": "dairy",
+    "cost_per_100g": 1.2,
+    "nutrition_per_100g": {
+      "calories": 340,
+      "protein_g": 2.8,
+      "carbs_g": 2.8,
+      "fat_g": 36.1,
+      "fiber_g": 0.0,
+      "sodium_mg": 27
+    },
+    "shelf_life_days": 14,
+    "substitutes": [
+      "coconut milk"
+    ]
+  },
+  "white wine": {
+    "category": "alcohol",
+    "cost_per_100g": 1.5,
+    "nutrition_per_100g": {
+      "calories": 82,
+      "protein_g": 0.1,
+      "carbs_g": 2.6,
+      "fat_g": 0.0,
+      "fiber_g": 0.0,
+      "sodium_mg": 5
+    },
+    "shelf_life_days": 365,
+    "substitutes": []
+  },
+  "salmon fillet": {
+    "category": "seafood",
+    "cost_per_100g": 3.8,
+    "nutrition_per_100g": {
+      "calories": 208,
+      "protein_g": 20.4,
+      "carbs_g": 0.0,
+      "fat_g": 13.4,
+      "fiber_g": 0.0,
+      "sodium_mg": 59
+    },
+    "shelf_life_days": 2,
+    "substitutes": [
+      "canned tuna",
+      "chicken breast"
+    ]
+  },
+  "sirloin steak": {
+    "category": "meat_poultry",
+    "cost_per_100g": 4.2,
+    "nutrition_per_100g": {
+      "calories": 271,
+      "protein_g": 25.0,
+      "carbs_g": 0.0,
+      "fat_g": 19.0,
+      "fiber_g": 0.0,
+      "sodium_mg": 58
+    },
+    "shelf_life_days": 3,
+    "substitutes": [
+      "chicken breast"
+    ]
+  },
+  "prawns": {
+    "category": "seafood",
+    "cost_per_100g": 2.8,
+    "nutrition_per_100g": {
+      "calories": 99,
+      "protein_g": 24.0,
+      "carbs_g": 0.2,
+      "fat_g": 0.3,
+      "fiber_g": 0.0,
+      "sodium_mg": 111
+    },
+    "shelf_life_days": 2,
+    "substitutes": [
+      "canned tuna",
+      "firm tofu"
+    ]
+  },
+  "scallops": {
+    "category": "seafood",
+    "cost_per_100g": 4.5,
+    "nutrition_per_100g": {
+      "calories": 88,
+      "protein_g": 16.8,
+      "carbs_g": 2.4,
+      "fat_g": 0.8,
+      "fiber_g": 0.0,
+      "sodium_mg": 161
+    },
+    "shelf_life_days": 2,
+    "substitutes": [
+      "prawns",
+      "canned tuna"
+    ]
   }
 }

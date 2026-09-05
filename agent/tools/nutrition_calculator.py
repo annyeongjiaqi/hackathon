@@ -74,6 +74,7 @@ _NUTRIENT_KEYS = ("calories", "protein_g", "carbs_g", "fats_g", "fiber_g")
 _COUNT_UNITS = {
     "pcs", "pc", "piece", "pieces", "unit", "units",
     "ct", "count", "whole", "each", "ea",
+    "stalk", "stalks",   # lemongrass / spring onion are naturally counted this way
 }
 
 # Count units that also imply a specific ingredient regardless of the line name
@@ -105,6 +106,21 @@ _COUNT_ITEM_GRAMS: dict[str, float] = {
     "chicken breast": 174.0,
     "firm tofu": 300.0,     # one block
     "canned tuna": 142.0,   # one can, drained
+    # 8-cuisine expansion: naturally-countable additions
+    "spring onion": 15.0,   # one stalk
+    "shallot": 25.0,
+    "shallots": 25.0,
+    "lemongrass": 20.0,     # one trimmed stalk
+    "button mushrooms": 18.0,   # one mushroom
+    "button mushroom": 18.0,
+    "mushroom": 18.0,
+    "mushrooms": 18.0,
+    "salmon fillet": 140.0,
+    "sirloin steak": 220.0,
+    "prawns": 15.0,        # one medium peeled prawn
+    "prawn": 15.0,
+    "scallops": 20.0,     # one scallop
+    "scallop": 20.0,
     # common generics
     "bread": 28.0,          # one sandwich slice
     "slice of bread": 28.0,
